@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../node_modules/jstree/dist/themes/default/style.min.css" />
+
+
+  <script src="../js/external/ace/ace.js" type="text/javascript"></script>
+  <script src="../js/external/ace/ext-beautify.js" type="text/javascript"></script>
+  <script src="../js/views/visualizer.js"></script>
+  <script src="../node_modules/colresizable/colResizable-1.6.min.js"></script>
+
+  <title>DiscoPoP Visualizer</title>
+</head>
+
+<body>
+  <table id="visualizer-table" border="1">
+    <tr>
+      <td>
+        <div id="code-view">
+          <ul class="nav nav-pills">
+            <li class="active col-sm-5">
+              <a data-toggle="pill" href="#code-container" id="code-container-tab"></a>
+            </li>
+            <li class="col-sm-5">
+              <a data-toggle="pill" href="#file-select-container" id="file-select-tab">Files</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div id="code-container" class="tab-pane fade in active">
+              <div id="ace-editor"></div>
+            </div>
+            <div id="file-select-container" class="tab-pane fade"></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <table style="width: 100%; height: 100%;" border="1">
+          <tr>
+            <td>
+              <div class="container" id="graph-container">
+                <button class="btn btn-primary pull-right btn-sm" type="button" id="show-legend-button">
+                  Legend
+                </button>
+                <button class="btn btn-primary pull-right btn-sm" type="button" id="node-info-button">
+                  <span class="glyphicon glyphicon-info-sign" id="node-info-available-icon"></span> Node <span class="glyphicon glyphicon-collapse-down" id="node-info-collapse-icon"></span>
+                </button>
+                <button class="btn btn-primary pull-right btn-sm" type="button" id="reset-graph-button">
+                  Reset Graph
+                </button>
+                <div class="tab-content">
+                  <div id="flow-graph-container" class="tab-pane fade in active">
+                    <svg></svg>
+                  </div>
+                  <div id="tooltip-container"></div>
+                  <div id="node-info-container"></div>
+                  <script type="text/x-handlebars-template" id="cuInfoTableTemplate">
+                    <table class="table-bordered" id="node-info-table">
+                      {{#each nodeData}}
+                      <tr>
+                        <th>
+                          {{@key}}
+                        </th>
+                        <td>
+                          {{{this}}}
+                        </td>
+                      </tr>
+                      {{/each}}
+                      {{#if hasVariables}}
+                      <tr>
+                        <td style="width:50%; vertical-align: baseline;">
+                          <p>
+                            Local Variables
+                          </p>
+                          <div class="variable-container">
+                            {{#each localVariables}}
+                            <label style="font-weight: bold">{{this.name}} ({{this.type}})</label>
+                            <br> {{/each}}
+                          </div>
+                        </td>
+                        <td style="width:50%; vertical-align: baseline;">
+                          <p>
+                            Global Variables
+                          </p>
+                          <div class="variable-container">
+                            {{#each globalVariables}}
+                            <label style="font-weight: bold">{{this.name}} ({{this.type}})</label>
+                            <br> {{/each}}
+                          </div>
+                        </td>
+                      </tr>
+                      {{/if}}
+                      {{#if dependencies}}
+                      <tr>
+                        <td colspan="2">
+                          <p>
+                            Dependencies
+                          </p>
+                          <div id="dependency-container">
+                            {{#each dependencies}}
+                            <a class="link-to-line" data-file-line="{{this.sourceLine}}" data-file-id="{{this.sourceFile}}"><span class="glyphicon glyphicon-{{#if this.sourceRead}}open{{else}}save{{/if}}"></span></a>
+                            <label style="font-weight: bold">&rarr; {{this.varName}} &rarr;</label>
+                            <a class="link-to-line" data-file-line="{{this.sinkLine}}" data-file-id="{{this.sinkFile}}"><span class="glyphicon glyphicon-{{#if this.sinkRead}}open{{else}}save{{/if}}"></span></a>
+                            <br /> {{/each}}
+                          </div>
+                        </td>
+                      </tr>
+                      {{/if}}
+                    </table>
+                  </script>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table id="legend-table">
+                <tr>
+                  <td>
+                    <div id="legend-container">
+                      <svg width="460pt" height="133pt" viewBox="0.00 0.00 459.92 132.80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g id="legend-graph" class="graph" transform="scale(1 1) rotate(0) translate(4 128.8)">
+                          <title>G</title>
+                          <polygon fill="white" stroke="none" points="-4,4 -4,-128.8 455.923,-128.8 455.923,4 -4,4" />
+                          <!-- cu -->
+                          <g id="node1" class="node cu-node">
+                            <title>cu</title>
+                            <polygon fill="none" stroke="black" points="216.999,-124.8 89.7847,-124.8 89.7847,-88.8 216.999,-88.8 216.999,-124.8" />
+                            <text text-anchor="middle" x="153.392" y="-102.6" font-family="Times,serif" font-size="14.00">Computational Unit</text>
+                          </g>
+                          <!-- function -->
+                          <g id="node2" class="node function-node">
+                            <title>function</title>
+                            <polygon fill="none" stroke="black" points="104.676,-18 78.534,-36 26.2499,-36 0.10785,-18 26.2499,-2.84217e-14 78.534,-0 104.676,-18" />
+                            <text text-anchor="middle" x="52.3919" y="-13.8" font-family="Times,serif" font-size="14.00">Function</text>
+                          </g>
+                          <!-- cu&#45;&gt;function -->
+                          <g id="edge1" class="edge function-call-edge">
+                            <title>cu&#45;&gt;function</title>
+                            <path fill="none" stroke="black" stroke-dasharray="1,5" d="M89.6907,-88.9021C80.6643,-84.2416 72.2242,-78.3187 65.6205,-70.8 59.6984,-64.0572 56.3626,-55.0187 54.5044,-46.3803" />
+                            <polygon fill="black" stroke="black" points="57.917,-45.5526 52.8959,-36.2232 51.0032,-46.6475 57.917,-45.5526" />
+                            <text text-anchor="middle" x="105.278" y="-58.2" font-family="Times,serif" font-size="14.00">Function&#45;Call</text>
+                          </g>
+                          <!-- loop -->
+                          <g id="node3" class="node loop-node">
+                            <title>loop</title>
+                            <ellipse fill="none" stroke="black" cx="200.392" cy="-18" rx="31.3429" ry="18" />
+                            <text text-anchor="middle" x="200.392" y="-13.8" font-family="Times,serif" font-size="14.00">Loop</text>
+                          </g>
+                          <!-- cu&#45;&gt;loop -->
+                          <g id="edge3" class="edge dependency-edge">
+                            <title>cu&#45;&gt;loop</title>
+                            <path fill="none" stroke="black" d="M148.115,-88.5375C145.897,-77.9897 144.938,-64.5473 150.427,-54 154.312,-46.5355 160.598,-40.3331 167.421,-35.3283" />
+                            <polygon fill="black" stroke="black" points="169.727,-38.0043 176.21,-29.6246 165.916,-32.1324 169.727,-38.0043" />
+                            <text text-anchor="middle" x="186.374" y="-58.2" font-family="Times,serif" font-size="14.00">Dependency</text>
+                          </g>
+                          <!-- loop&#45;&gt;cu -->
+                          <g id="edge2" class="edge flow-edge">
+                            <title>loop&#45;&gt;cu</title>
+                            <path fill="none" stroke="black" d="M215.223,-34.0106C223.856,-44.6297 231.72,-59.017 224.392,-70.8 221.606,-75.2801 218.058,-79.2036 214.041,-82.6367" />
+                            <polygon fill="black" stroke="black" points="211.82,-79.9249 205.812,-88.6518 215.95,-85.5761 211.82,-79.9249" />
+                            <text text-anchor="middle" x="256.325" y="-58.2" font-family="Times,serif" font-size="14.00">Data&#45;Flow</text>
+                          </g>
+                          <!-- libFunc -->
+                          <g id="node4" class="node library-function-node">
+                            <title>libFunc</title>
+                            <polygon fill="none" stroke="black" points="343.392,-124.8 234.829,-106.8 343.392,-88.8 451.955,-106.8 343.392,-124.8" />
+                            <text text-anchor="middle" x="343.392" y="-102.6" font-family="Times,serif" font-size="14.00">Library Function</text>
+                          </g>
+                        </g>
+                      </svg>
+                    </div>
+                  </td>
+                  <td>
+                    <div id="help-container">
+                      <h4>Importing</h4>
+                      <ul <li>
+                        Click on Import or press ctrl+I. Select the file-mapping file and then the data file output by DiscoPoP.
+                        </li>
+                      </ul>
+                      <h4>Graph</h4>
+                      <ul>
+                        <li>
+                          Move the graph by clicking on any point and dragging it
+                        </li>
+                        <li>
+                          Zoom in or out from the graph with your mouse-wheel
+                        </li>
+                        <li>
+                          Click on a node to select it. Doing so will highlight the lines of code it contains.
+                        </li>
+                        <li>
+                          Double-click on a node to expand it
+                        </li>
+                        <li>
+                          Right-click on a node to see all possible actions on it
+                        </li>
+                        <li>
+                          Click on a dependency-edge's variable to highlight the accesses to the variable in the code
+                        </li>
+                        <li>
+                          <span class="glyphicon glyphicon-save"></span>: represents a write to a variable. Click: display the line on which that write occurs in the code.
+                        </li>
+                        <li>
+                          <span class="glyphicon glyphicon-open"></span>: represents a read from a variable. Click: display the line on which that read occurs in the code.
+                        </li>
+						<li>
+						   <a style "font-family: font-awesome">&#8618;</a>: represents a call to a function. Click: highlight the line on which the function-call occurs in the code.
+						</li>
+						<li>
+						  <span style="font-family: font-awesome">&#xf06d;</span>: its color represents the heat-level of the node in relation to the others.
+						</li>
+                      </ul>
+                      <h4>Code</h4>
+                      <ul>
+                        <li>
+                          On the Files tab, select a file to open it. You may right-click on any line of code in the file to find the Computational-Unit that contains it.
+                        </li>
+                        <li>
+                          A line-number marked with <span class="editor_write_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a write on the variable
+                        </li>
+                        <li>
+                          A line-number marked with <span class="editor_read_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a read on the variable
+                        </li>
+                      </ul>
+                      <h4>Preferences</h4>
+                      <ul>
+                        <li>
+                          You may change the maximum level of ancestry visible in the graph, as well as some color-settings for the graph by clicking on Preferences and then Graph, or pressing ctrl+G.
+                        </li>
+                        <li>
+                          You may change some styling-settings for the code-viewer by clicking on Preferences and then Code, or pressing ctrl+E.
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+<script>
+  var onSampleResized = function(e) {
+    var columns = $(e.currentTarget).find("td");
+  };
+  $("#visualizer-table").colResizable();
+</script>
+
+<script type="text/x-handlebars-template" id="clusterLabelTemplate">
+  <table>
+    <tr>
+      <td>
+        {{name}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{file}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{lines}}
+      </td>
+    </tr>
+  </table>
+</script>
+
+</html>
