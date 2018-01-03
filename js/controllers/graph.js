@@ -280,7 +280,7 @@ module.exports = {
         checkedNodes.push(node.id);
 
         // Continue with new subgraph only if node is expanded, otherwise add as
-		  // node (bottom)
+		    // node (bottom)
         if (node.expanded) {
           digraph += "\nsubgraph cluster" + node.id + " {"
           var edge;
