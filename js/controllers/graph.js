@@ -440,6 +440,10 @@ module.exports = {
           svg = svg.replace('<g id="' + edge.replace(' -> ', 't') + '" class="edge"', '<g id="' + edge + '" class="edge dependency-edge"');
         });
 
+        // remove the href tag
+        svg = svg.replace('</a>','')
+
+        svg = svg.replace(svg.substring(svg.indexOf('<a xlink'),svg.indexOf('>',svg.indexOf('<a xlink'))+1),'')
         // Hack for removing title tooltip from elements (not supported by
 		  // graphviz)
         svg = svg.replace(/<title>.*<\/title>/g, '');
@@ -491,6 +495,7 @@ module.exports = {
           label += '\n<TR><TD>' + node.name + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
+          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
           label += '\n</TABLE>>';
           break;
         case 2:

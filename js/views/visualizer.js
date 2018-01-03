@@ -212,6 +212,7 @@ ipc
 									'g.node, g.cluster',
 									'click',
 									function(e) {
+										debugger;
 										e.stopImmediatePropagation();
 										var node = nodeData[this.id];
 
@@ -341,24 +342,36 @@ ipc
 
 					// Double click events
 					graphContainer.delegate('g.node', 'dblclick', function(
-							event) {
-						event.stopImmediatePropagation();
-						var node = nodeData[this.id];
-						var cuNodes, loopNodes, functionNodes;
+						event) {
+							debugger;
+					event.stopImmediatePropagation();
+					var node = nodeData[this.id];
+					var cuNodes, loopNodes, functionNodes;
 
-						if (node.children.length) {
-							ipc.send('expandNode', node.id);
-						}
+					if (node.children.length) {
+						ipc.send('expandNode', node.id);
+					}
 					});
 
-					graphContainer
+
+					graphContainer.delegate('#a_pipeline', 'click', function(
+					event) { 
+						debugger;
+						event.stopImmediatePropagation();
+						console.log("#pipeline click performed");
+
+						
+					});
+
+				graphContainer
 							.delegate(
 									'g.cluster',
 									'click',
 									function() {
-										editorController.unhighlight();
-										editorController
-												.highlightNodeInCode(nodeData[this.id]);
+										debugger;
+										// editorController.unhighlight();
+										// editorController
+										// 		.highlightNodeInCode(nodeData[this.id]);
 									});
 
 					// tooltip (hover) events

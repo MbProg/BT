@@ -21,7 +21,6 @@ var graphController;
 
 const dialog = require('electron').dialog;
 console.log("Hello");
-
 var template = [{
   label: 'File',
   submenu: [{
