@@ -84,7 +84,7 @@ class ExpansionPath {
 module.exports = {
   controller: function controller(nodes, rootNodes) {
     var expansionPath = new ExpansionPath(rootNodes);
-
+    var expandeNodeDependency;
     function findFirstVisibleAncestor(node) {
       if (!node.parents.length)
         return false;
@@ -139,6 +139,22 @@ module.exports = {
       event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     });
 
+    ipc.on('expandDependency', function(event,nodeId,expandDependency)
+  {
+    console.log("Test");
+    console.log('expandOne', nodeId);
+    nodes[nodeId].expandDependency = !nodes[nodeId].expandDependency;
+    if(nodes[nodeId].expandDependency)
+      expandeNodeDependency = nodeId;
+    else
+      expandeNodeDependency = -1;
+
+    var node = nodes[nodeId];
+    if (node.type >= 0 && node.type < 3) {
+      expansionPath.addNode(node);
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+    }
+  })
     ipc.on('expandNode', function(event, nodeId) {
       console.log("Test");
       console.log('expandOne', nodeId);
@@ -248,7 +264,7 @@ module.exports = {
 		 * digraph in DOT format. Used as input for Viz.js
 		 */
       var digraph;
-
+      var expandendDependencies = [];
       var checkedNodes = [];
       var functionNodes = [];
       var functionCallEdges = [];
@@ -346,6 +362,11 @@ module.exports = {
           digraph += '\nstyle="filled"';
           digraph += '\nid=' + node.id;
           digraph += "\n}";
+          if(node.expandDependency)
+          {
+            // if it should show the dependencies of the children
+            // we create here the edge DOT language
+          }
         } else {
           var shape;
           switch (node.type) {
@@ -382,6 +403,17 @@ module.exports = {
       _.each(dependencyEdges, function(edge) {
           digraph += edge;          
       });
+
+      // 
+      if (expandeNodeDependency >= 0)
+      {
+        // then we should show the dependencies of this node
+        //edge [id = 1123, color="red",penwidth="3.0"]; 2 -> c -> e -> a [weight=1]
+
+        dependencyDOT = '{edge [id = ED' + expandDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandDependency]._depDotString + "}"
+
+      }
+      // 
       digraph += "\n}";
       
       fs.writeFile('debug_dot.txt', digraph, function(err) {
@@ -441,9 +473,13 @@ module.exports = {
         });
 
         // remove the href tag
-        svg = svg.replace('</a>','')
+        svg = svg.replace(new RegExp('</a>', 'g'),'')
 
-        svg = svg.replace(svg.substring(svg.indexOf('<a xlink'),svg.indexOf('>',svg.indexOf('<a xlink'))+1),'')
+        while(svg.indexOf('<a xlink')> -1)
+        {
+          svg = svg.replace(svg.substring(svg.indexOf('<a xlink'),svg.indexOf('>',svg.indexOf('<a xlink'))+1),'')
+        }
+        
         // Hack for removing title tooltip from elements (not supported by
 		  // graphviz)
         svg = svg.replace(/<title>.*<\/title>/g, '');
@@ -480,6 +516,7 @@ module.exports = {
           }
           // label += '\n<TR><TD COLSPAN="' + colspan + '">[' + node.startLine
 			// + '-' + node.endLine + ']</TD></TR>';
+          label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD COLSPAN="' + colspan + '">Data-Read: ' + generalFunctions.humanFileSize(node.readDataSize, true) + '</TD></TR>';
           label += '\n<TR><TD COLSPAN="' + colspan + '">Data-Written: ' + generalFunctions.humanFileSize(node.writeDataSize, true) + '</TD></TR><TR>';
           if (node.children.length) {
@@ -493,19 +530,23 @@ module.exports = {
           break;
         case 1:
           label += '\n<TR><TD>' + node.name + '</TD></TR>';
+          label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
-          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
+          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec;</FONT></TD></TR>';
           label += '\n</TABLE>>';
           break;
         case 2:
           label += '\n<TR><TD>Loop</TD></TR>';
+          label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
           label += '\n</TABLE>>';
           break;
         default:
           label = '"' + node.name + '"';
+          label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
+
       }
       return label;
     }

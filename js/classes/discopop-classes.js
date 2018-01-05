@@ -18,8 +18,9 @@ class Node {
    * @param   {number[]}    writeLines      The lines on which a write occurs within the CU
    * @param   {number}      heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, fileId, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+  constructor(id, originalId, fileId, depDotString, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
     this._id = id;
+    this._originalId = originalId;
     this._fileId = fileId;
     this._type = type;
     this._startLine = startLine;
@@ -32,7 +33,9 @@ class Node {
     this._children = [];
     this._heatFactor = heatFactor
     this._collapsed = true;
+    this._dependencyCollapsed = true;
     this._depsOn = false;
+    this._depDotString = depDotString;
   }
 
   /**
@@ -66,6 +69,10 @@ class Node {
    */
   get id() {
     return this._id;
+  }
+
+  get originalId(){
+    return this._originalId;
   }
 
   /**
@@ -164,6 +171,9 @@ class Node {
     return !this._collapsed;
   }
 
+  get dependencyExpanded(){
+    return !this._dependencyCollapsed;
+  }
   /**
    * Sets the node to be expanded
    */
@@ -178,6 +188,14 @@ class Node {
    */
   collapse() {
     this._collapsed = true;
+  }
+
+  dependencyExpand(){
+    this._dependencyCollapsed = false;
+  }
+
+  dependencyCollapse(){
+    this._dependencyCollapsed = true;
   }
 }
 
@@ -199,7 +217,7 @@ class CuNode extends Node {
    * @param  {!number[]}        writeLines      The lines on which a write occurs within the CU
    * @param  {number}           heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, fileId, lines, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+  constructor(id, originalId, fileId, lines, depDotString, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
       var start = lines[0];
       var end = lines[0];
       var temp = [];
@@ -212,7 +230,7 @@ class CuNode extends Node {
     	  }
     	  temp[i] = lines[i];
       }
-	  super(id, fileId, 0, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+	  super(id, originalId, fileId, 0, depDotString, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor );
       this._localVariables = [];
       this._globalVariables = [];
       this._dependencies = [];
@@ -358,8 +376,8 @@ class LoopNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, fileId, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount) {
-    super(id, fileId, 2, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+  constructor(id, originalId, fileId, depDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount) {
+    super(id, originalId, fileId, 2, depDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
     this._level = level;
     this._descendantNodeCount = descendantNodeCount;
   }
@@ -393,8 +411,8 @@ class LibraryFunctionNode extends Node {
    * @param  {!number} fileId  The id of the file it refers to
    * @param  {!string} name    The name of the function
    */
-  constructor(id, fileId, name) {
-    super(id, fileId, 3);
+  constructor(id, originalId, fileId, name,depDotString) {
+    super(id,originalId, fileId, 3, depDotString);
     this._name = name;
   }
 
@@ -426,8 +444,8 @@ class FunctionNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, fileId, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount) {
-    super(id, fileId, 1, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+  constructor(id, originalId, fileId, depDotString,  startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount) {
+    super(id, originalId, fileId, 1,  depDotString ,startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
     this._name = name;
     this._arguments = [];
     this._descendantNodeCount = descendantNodeCount;

@@ -40,22 +40,41 @@ module.exports = {
     for (i = 0; i < data.nodeData.length; i++) {
       
       node = data.nodeData[i];
+
+      // set the dependency
+      var depDotString = "";
+      node.childrenNodes.forEach(child => {
+        let set = new Set();
+        child.DependencyAll_RAW.forEach(dep =>{
+          node.childrenNodes.forEach(otherChild =>{
+            if (otherChild.originalId == dep.CUid)
+            {
+              set.add(dep.CUid);
+            }
+          })
+        })
+        set.forEach(depNode =>{
+          depDotString += depDotString + child + "->" + depNode + " ";
+        })
+      });
+      node.depDotString = depDotString;
+      
       switch (node.type) {
         case 0:
-          nodes.push(new CuNode(i, node.fileId, node.lines, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
           break;
         case 1:
-          classNode = new FunctionNode(i, node.fileId, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
-          nodes.push(new LoopNode(i, node.fileId, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
           break;
         case 3:
-          nodes.push(new LibraryFunctionNode(i, node.fileId, node.name));
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depDotString));
           break;
         default:
           console.error("Tried adding a node with a wrong type", node);
