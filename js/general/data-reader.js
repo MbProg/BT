@@ -177,10 +177,15 @@ module.exports = {
 
     // Add parentNodes and predecessorCUs properties to nodes
     _.each(fileContents, function(node) {
+      node.tempChildrenNodes =  JSON.parse(JSON.stringify(node.childrenNodes))
       for (i = 0; i < node.childrenNodes.length; i++) {
         // CHANGED:        childNodeId = nodeMap[node.childrenNodes[i]];
         childNodeId = nodeMap[node.childrenNodes[i].id]
-
+        // set the new ID also in the tempchildrennodes. We need them to be able to map them for drawing
+        node.tempChildrenNodes[i].newID = nodeMap[node.childrenNodes[i].id]
+        _.each(node.tempChildrenNodes[i].DependencyAll_RAW, function(dep){
+            dep.newID = nodeMap[dep.CUid]
+        });
         // Add missing library functions
         if (typeof childNodeId === 'undefined') {
 		  console.info("\nNode " + originalNodeIdMap[node.id] + " has a childNode which does not exist ("+node.childrenNodes[i]+"). Adding it manually as a Library Function");
@@ -196,6 +201,7 @@ module.exports = {
 
         }
         // Update id of childNode
+        
         node.childrenNodes[i] = childNodeId;
         // Add this node to childrens parentNodes
         fileContents[childNodeId].parentNodes.push(node.id);

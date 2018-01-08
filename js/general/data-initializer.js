@@ -39,44 +39,62 @@ module.exports = {
 
     for (i = 0; i < data.nodeData.length; i++) {
       
+      if (i == 17)
+        var skldjf = 0;
       node = data.nodeData[i];
 
       // set the dependency
-      var depDotString = "";
-      node.childrenNodes.forEach(child => {
-        let set = new Set();
-        child.DependencyAll_RAW.forEach(dep =>{
-          node.childrenNodes.forEach(otherChild =>{
-            if (otherChild.originalId == dep.CUid)
-            {
-              set.add(dep.CUid);
-            }
+      // here we build the dependency dot file for doAll
+      var depBadDotString = "";
+      var depGoodDotString = "";
+      for (let m = 0; m < node.tempChildrenNodes.length; m++)
+      {
+        let badSet = new Set();
+        let goodSet = new Set();
+        let child = node.tempChildrenNodes[m];
+        for (let n = 0; n < node.tempChildrenNodes.length; n++)
+        {
+          let otherChild = node.tempChildrenNodes[n];
+          child.DependencyAll_RAW.forEach(dep =>{
+              if (otherChild.id == dep.CUid)
+              {
+                if (m>n)
+                  goodSet.add(dep.newID);
+                else
+                  badSet.add(dep.newID);
+              }
           })
+  
+        }
+        badSet.forEach(depNode =>{
+          depBadDotString +=  child.newID + "->" + depNode + " ";
         })
-        set.forEach(depNode =>{
-          depDotString += depDotString + child + "->" + depNode + " ";
+        goodSet.forEach(depNode =>{
+          depGoodDotString +=  child.newID + "->" + depNode + " ";
         })
-      });
-      node.depDotString = depDotString;
+      }
+ 
+      node.depGoodDotString = depGoodDotString;
+      node.depBadDotString = depBadDotString;
       
       switch (node.type) {
         case 0:
-          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
           break;
         case 1:
-          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString, node.depBadDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
-          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString, node.depBadDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
           break;
         case 3:
-          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depDotString));
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString, node.depBadDotString));
           break;
-        default:
+        default: 
           console.error("Tried adding a node with a wrong type", node);
       }
     }
