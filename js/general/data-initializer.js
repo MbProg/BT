@@ -39,11 +39,10 @@ module.exports = {
 
     for (i = 0; i < data.nodeData.length; i++) {
       
-      if (i == 17)
-        var skldjf = 0;
       node = data.nodeData[i];
 
       // set the dependency
+<<<<<<< HEAD
       // here we build the dependency dot file for doAll
       var depBadDotString = "";
       var depGoodDotString = "";
@@ -73,15 +72,23 @@ module.exports = {
                 else
                   goodPipelineSet.add(dep.newID);                  
               }
+=======
+      var depDotString = "";
+      node.childrenNodes.forEach(child => {
+        let set = new Set();
+        child.DependencyAll_RAW.forEach(dep =>{
+          node.childrenNodes.forEach(otherChild =>{
+            if (otherChild.originalId == dep.CUid)
+            {
+              set.add(dep.CUid);
+            }
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
           })
-  
-        }
-        badSet.forEach(depNode =>{
-          depBadDotString +=  child.newID + "->" + depNode + " ";
         })
-        goodSet.forEach(depNode =>{
-          depGoodDotString +=  child.newID + "->" + depNode + " ";
+        set.forEach(depNode =>{
+          depDotString += depDotString + child + "->" + depNode + " ";
         })
+<<<<<<< HEAD
         badPipelineSet.forEach(depNode =>{
           depBadPipelineDotString +=  child.newID + "->" + depNode + " ";
         })
@@ -95,27 +102,45 @@ module.exports = {
       node.depBadDotString = depBadDotString;
       node.depGoodPipelineDotString = depGoodPipelineDotString;
       node.depBadPipelineDotString = depBadPipelineDotString;
+=======
+      });
+      node.depDotString = depDotString;
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
       
 
 
       switch (node.type) {
         case 0:
+<<<<<<< HEAD
           nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
           break;
         case 1:
           classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
+=======
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
+          break;
+        case 1:
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
+<<<<<<< HEAD
           nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
           break;
         case 3:
           nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,));
+=======
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
           break;
-        default: 
+        case 3:
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depDotString));
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
+          break;
+        default:
           console.error("Tried adding a node with a wrong type", node);
       }
     }

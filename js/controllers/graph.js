@@ -409,14 +409,9 @@ module.exports = {
       {
         // then we should show the dependencies of this node
         //edge [id = 1123, color="red",penwidth="3.0"]; 2 -> c -> e -> a [weight=1]
-        if(nodes[expandeNodeDependency]._depGoodDotString != "")
-        {
-          digraph += '{edge [id = ED' + expandeNodeDependency + ', color="blue",penwidth="3.0"]; ' + nodes[expandeNodeDependency]._depGoodDotString + "}"
-        }
-        if(nodes[expandeNodeDependency]._depBadDotString != "")
-        {
-          digraph +='{edge [id = ED' + expandeNodeDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandeNodeDependency]._depBadDotString + "}"
-        }
+
+        dependencyDOT = '{edge [id = ED' + expandDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandDependency]._depDotString + "}"
+
       }
       // 
       digraph += "\n}";
@@ -546,7 +541,6 @@ module.exports = {
           label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
-          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec;</FONT></TD></TR>';
           label += '\n</TABLE>>';
           break;
         default:

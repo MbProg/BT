@@ -18,7 +18,11 @@ class Node {
    * @param   {number[]}    writeLines      The lines on which a write occurs within the CU
    * @param   {number}      heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
+<<<<<<< HEAD
   constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+=======
+  constructor(id, originalId, fileId, depDotString, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
     this._id = id;
     this._originalId = originalId;
     this._fileId = fileId;
@@ -35,10 +39,14 @@ class Node {
     this._collapsed = true;
     this._dependencyCollapsed = true;
     this._depsOn = false;
+<<<<<<< HEAD
     this._depGoodDotString = depGoodDotString;
     this._depBadDotString = depBadDotString
     this._depGoodPipelineDotString = depGoodPipelineDotString;
     this._depBadPipelineDotString = depBadPipelineDotString;
+=======
+    this._depDotString = depDotString;
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
   }
 
   /**
@@ -220,7 +228,11 @@ class CuNode extends Node {
    * @param  {!number[]}        writeLines      The lines on which a write occurs within the CU
    * @param  {number}           heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
+<<<<<<< HEAD
   constructor(id, originalId, fileId, lines, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+=======
+  constructor(id, originalId, fileId, lines, depDotString, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
       var start = lines[0];
       var end = lines[0];
       var temp = [];
@@ -233,7 +245,11 @@ class CuNode extends Node {
     	  }
     	  temp[i] = lines[i];
       }
+<<<<<<< HEAD
 	  super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 0, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor );
+=======
+	  super(id, originalId, fileId, 0, depDotString, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor );
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
       this._localVariables = [];
       this._globalVariables = [];
       this._dependencies = [];
@@ -379,8 +395,13 @@ class LoopNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
+<<<<<<< HEAD
   constructor(id, originalId, fileId, depGoodDotString,depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount) {
     super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 2, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+=======
+  constructor(id, originalId, fileId, depDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount) {
+    super(id, originalId, fileId, 2, depDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
     this._level = level;
     this._descendantNodeCount = descendantNodeCount;
   }
@@ -414,8 +435,13 @@ class LibraryFunctionNode extends Node {
    * @param  {!number} fileId  The id of the file it refers to
    * @param  {!string} name    The name of the function
    */
+<<<<<<< HEAD
   constructor(id, originalId, fileId, name,depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString) {
     super(id,originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 3);
+=======
+  constructor(id, originalId, fileId, name,depDotString) {
+    super(id,originalId, fileId, 3, depDotString);
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
     this._name = name;
   }
 
@@ -447,8 +473,13 @@ class FunctionNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
+<<<<<<< HEAD
   constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString,  startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount) {
     super(id, originalId, fileId,  depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 1,startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+=======
+  constructor(id, originalId, fileId, depDotString,  startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount) {
+    super(id, originalId, fileId, 1,  depDotString ,startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+>>>>>>> parent of 4c1a44dd... good and bad dependencies finished for DoAll
     this._name = name;
     this._arguments = [];
     this._descendantNodeCount = descendantNodeCount;
