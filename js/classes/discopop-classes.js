@@ -18,7 +18,7 @@ class Node {
    * @param   {number[]}    writeLines      The lines on which a write occurs within the CU
    * @param   {number}      heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, type, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition) {
     this._id = id;
     this._originalId = originalId;
     this._fileId = fileId;
@@ -39,6 +39,9 @@ class Node {
     this._depBadDotString = depBadDotString
     this._depGoodPipelineDotString = depGoodPipelineDotString;
     this._depBadPipelineDotString = depBadPipelineDotString;
+    this._pipelineScalarValue = pipelineScalarValue;
+    this._doAllScalarValue = doAllScalarValue;
+    this._geometricDecomposition = geometricDecomposition;
   }
 
   /**
@@ -220,7 +223,7 @@ class CuNode extends Node {
    * @param  {!number[]}        writeLines      The lines on which a write occurs within the CU
    * @param  {number}           heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, lines, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, readDataSize, writeDataSize, readLines, writeLines, heatFactor) {
+  constructor(id, originalId, fileId, lines, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition) {
       var start = lines[0];
       var end = lines[0];
       var temp = [];
@@ -233,7 +236,7 @@ class CuNode extends Node {
     	  }
     	  temp[i] = lines[i];
       }
-	  super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 0, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor );
+	  super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 0, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue ,geometricDecomposition);
       this._localVariables = [];
       this._globalVariables = [];
       this._dependencies = [];
@@ -379,8 +382,8 @@ class LoopNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString,depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount) {
-    super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 2, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+  constructor(id, originalId, fileId, depGoodDotString,depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition) {
+    super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 2, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition);
     this._level = level;
     this._descendantNodeCount = descendantNodeCount;
   }
@@ -414,8 +417,8 @@ class LibraryFunctionNode extends Node {
    * @param  {!number} fileId  The id of the file it refers to
    * @param  {!string} name    The name of the function
    */
-  constructor(id, originalId, fileId, name,depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString) {
-    super(id,originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 3);
+  constructor(id, originalId, fileId, name,depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString,pipelineScalarValue,doAllScalarValue,geometricDecomposition) {
+    super(id,originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 3,pipelineScalarValue,doAllScalarValue,geometricDecomposition);
     this._name = name;
   }
 
@@ -447,8 +450,8 @@ class FunctionNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString,  startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount) {
-    super(id, originalId, fileId,  depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 1,startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor);
+  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString,  startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition) {
+    super(id, originalId, fileId,  depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 1,startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition);
     this._name = name;
     this._arguments = [];
     this._descendantNodeCount = descendantNodeCount;

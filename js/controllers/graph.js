@@ -7,6 +7,8 @@ var sizeof = require('sizeof');
 const ipc = require("electron").ipcMain;
 var fs = require('fs');
 var Viz = require('../../node_modules/viz.js/viz.js');
+var g_pipelineThreshold = 0.0
+var g_doAllThreshold = 0.0
 /**
  * Class for keeping track of the node-expansions done by the user.
  */
@@ -28,6 +30,12 @@ class ExpansionPath {
       return this._rootNodes;
     }
     return this._expandedNodesPerLevel[level];
+  }
+  getPipelineThreshold(){
+    return configuration.readSetting('pipelineThreshold');
+  }
+  getDoAllThreshold(){
+    return configuration.readSetting('doAllThreshold');
   }
 
   /**
@@ -112,7 +120,7 @@ module.exports = {
       } else {
         expansionPath.removeNode(nodes[nodeId]);
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     /**
@@ -136,7 +144,7 @@ module.exports = {
     		  });
     	  }
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     ipc.on('expandDependency', function(event,nodeId,expandDependency)
@@ -152,7 +160,7 @@ module.exports = {
     var node = nodes[nodeId];
     if (node.type >= 0 && node.type < 3) {
       expansionPath.addNode(node);
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     }
   })
     ipc.on('expandNode', function(event, nodeId) {
@@ -161,14 +169,14 @@ module.exports = {
       var node = nodes[nodeId];
       if (node.type >= 0 && node.type < 3) {
         expansionPath.addNode(node);
-        event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+        event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
       }
     });
 
     ipc.on('collapseNode', function(event, nodeId) {
       var node = nodes[nodeId];
       expansionPath.removeNode(node);
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     ipc.on('expandAll', function(event, nodeId) {
@@ -191,7 +199,7 @@ module.exports = {
         }
       }
       while (stack.length);
-      event.sender.send('update-graph', generateSvgGraph([nodes[nodeId]]));
+      event.sender.send('update-graph', generateSvgGraph([nodes[nodeId]],expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     ipc.on('fullGraph', function(event) {
@@ -215,7 +223,7 @@ module.exports = {
         }
       }
       while (stack.length);
-      event.sender.send('update-graph', generateSvgGraph(rootNodes));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     ipc.on('expandTo', function(event, nodeId) {
@@ -231,7 +239,7 @@ module.exports = {
         currentNode = queue.pop();
         expansionPath.addNode(currentNode);
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     /**
@@ -242,7 +250,7 @@ module.exports = {
         expansionPath.reset();
         node.collapse();
       });
-      event.sender.send('update-graph', generateSvgGraph(rootNodes));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
     ipc.on('nodeInfo', function(nodeId) {
@@ -254,7 +262,15 @@ module.exports = {
 	 * 
 	 * @return {String} the string containing the HTML-Markup for the svg
 	 */
-    function generateSvgGraph(startNodes) {
+    function generateSvgGraph(startNodes,pipelineThreshold,doAllThreshold) {
+      
+      if(pipelineThreshold == undefined)
+        pipelineThreshold = configuration.readSetting('pipelineThreshold');
+      if(doAllThreshold == undefined)
+        doAllThreshold =  configuration.readSetting('doAllThreshold');
+
+      g_pipelineThreshold = pipelineThreshold;
+      g_doAllThreshold = doAllThreshold;
       var log = "StartNodes: ";
       _.each(startNodes, function(val) {
         log += val.id + ", ";
@@ -417,6 +433,13 @@ module.exports = {
         {
           digraph +='{edge [id = ED' + expandeNodeDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandeNodeDependency]._depBadDotString + "}"
         }
+        // highlight the children with a blue shape border
+        let highlightBorder = "{";
+        _.each(nodes[expandeNodeDependency]._children,function(child){
+          highlightBorder += child._id + "[penwidth=2, color=blue, fillcolor=grey];"
+        })
+        highlightBorder += "}";
+        digraph += highlightBorder;
       }
       // 
       digraph += "\n}";
@@ -530,15 +553,30 @@ module.exports = {
           label += '<TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD>';
           if (node.dependencies.length) {
             label += '<TD>D: ' + node.dependencies.length + '</TD>';
-          }
-          label += '\n</TR></TABLE>>';
+          }    
+          label += '\n</TR>'      
+          if(node._pipelineScalarValue > g_pipelineThreshold)
+            label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf231; (' + node._pipelineScalarValue + ')</FONT></TD></TR>';
+          if(node._doAllScalarValue > g_doAllThreshold)
+            label += '\n<TR><TD id = "doAll" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec; (' + node._doAllScalarValue + ')</FONT></TD></TR>';
+          if(node._geometricDecomposition == 1)
+            label += '\n<TR><TD id = "geometricDecomp" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf2a6; </FONT></TD></TR>';
+
+
+          label += '\n</TABLE>>';
           break;
         case 1:
           label += '\n<TR><TD>' + node.name + '</TD></TR>';
           label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
-          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec;</FONT></TD></TR>';
+          if(node._pipelineScalarValue > g_pipelineThreshold)
+            label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf231; (' + node._pipelineScalarValue + ')</FONT></TD></TR>';
+          if(node._doAllScalarValue > g_doAllThreshold)
+            label += '\n<TR><TD id = "doAll" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec; (' + node._doAllScalarValue + ')</FONT></TD></TR>';
+          if(node._geometricDecomposition == 1)
+            label += '\n<TR><TD id = "geometricDecomp" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf2a6; </FONT></TD></TR>';
+          
           label += '\n</TABLE>>';
           break;
         case 2:
@@ -546,7 +584,12 @@ module.exports = {
           label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
-          label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec;</FONT></TD></TR>';
+          if(node._pipelineScalarValue > g_pipelineThreshold)
+            label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf231; (' + node._pipelineScalarValue + ')</FONT></TD></TR>';
+          if(node._doAllScalarValue > g_doAllThreshold)
+            label += '\n<TR><TD id = "doAll" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec; (' + node._doAllScalarValue + ')</FONT></TD></TR>';
+          if(node._geometricDecomposition == 1)
+            label += '\n<TR><TD id = "geometricDecomp" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf2a6; </FONT></TD></TR>';
           label += '\n</TABLE>>';
           break;
         default:

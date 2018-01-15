@@ -22,7 +22,9 @@ nconf.defaults({
   dependencyEdgeWidth: 2,
   functionCallEdgeFill: '#000000',
   functionCallEdgeWidth: 1,
-  visibleParents: 5
+  visibleParents: 5,
+  pipelineThreshold: 0.9,
+  doAllThreshold: 0.9,
 });
 
 function getUserHome() {

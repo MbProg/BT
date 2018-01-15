@@ -274,6 +274,17 @@ ipc.on('init-listeners', function (event) {
 		}
 	});
 
+	graphContainer.delegate('#a_doAll', 'click', function (event) {
+		debugger;
+		event.stopImmediatePropagation();
+		var node = nodeData[this.parentElement.id];
+		var cuNodes, loopNodes, functionNodes;
+
+		if (node.children.length) {
+			ipc.send('expandDependency', node.id);
+		}
+	});
+
 	graphContainer.delegate('g.cluster', 'click', function () {
 		editorController.unhighlight();
 		editorController.highlightNodeInCode(nodeData[this.id]);

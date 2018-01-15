@@ -100,20 +100,20 @@ module.exports = {
 
       switch (node.type) {
         case 0:
-          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor));
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
           break;
         case 1:
-          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount);
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition);
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
-          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount));
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
           break;
         case 3:
-          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,));
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
           break;
         default: 
           console.error("Tried adding a node with a wrong type", node);

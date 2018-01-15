@@ -52,6 +52,11 @@
                 <button class="btn btn-primary pull-right btn-sm" type="button" id="reset-graph-button">
                   Reset Graph
                 </button>
+                <ul class="legend">
+                  <li><span class="goodDependency"></span>posoitive dependency</li>
+                  <li><span class="badDependency"></span>negative dependency</li>
+                  <li><span class="dataflowDependency"></span>Data flow</li>
+                </ul>
                 <div class="tab-content">
                   <div id="flow-graph-container" class="tab-pane fade in active">
                     <svg></svg>
@@ -208,12 +213,21 @@
                         <li>
                           <span class="glyphicon glyphicon-open"></span>: represents a read from a variable. Click: display the line on which that read occurs in the code.
                         </li>
-						<li>
-						   <a style "font-family: font-awesome">&#8618;</a>: represents a call to a function. Click: highlight the line on which the function-call occurs in the code.
-						</li>
-						<li>
-						  <span style="font-family: font-awesome">&#xf06d;</span>: its color represents the heat-level of the node in relation to the others.
-						</li>
+                        <li>
+                          <a style "font-family: font-awesome">&#8618;</a>: represents a call to a function. Click: highlight the line on which the function-call occurs in the code.
+                        </li>
+                        <li>
+                          <span style="font-family: font-awesome">&#xf06d;</span>: its color represents the heat-level of the node in relation to the others.
+                        </li>
+                        <li>
+                          <span style="font-family: font-awesome">&#xf231</span>: represents an existing pipeline that is above the defined threshold.
+                        </li>
+                        <li>
+                          <span style="font-family: font-awesome">&#xf0ec;</span>: represents an existing do-All pattern that is above the defined threshold.
+                        </li>
+                        <li>
+                          <span style="font-family: font-awesome">&#xf2a6;</span>: represents the exisiting of an Geometric Decomposition pattern.
+                        </li>
                       </ul>
                       <h4>Code</h4>
                       <ul>

@@ -101,7 +101,9 @@ $(document).ready(function() {
   });
 
   var otherSettingsTemplate = otherTemplate({
-    visibleParents: configuration.readSetting('visibleParents')
+    visibleParents: configuration.readSetting('visibleParents'),
+    pipelineThreshold: configuration.readSetting('pipelineThreshold'),
+    doAllThreshold: configuration.readSetting('doAllThreshold')
   });
 
   $("#nodeColorSettings").html(nodeColorSettingsTemplate);

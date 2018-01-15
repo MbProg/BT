@@ -526,3 +526,14 @@ a {
 #a_pipeline {
 	cursor:pointer;
 }
+#a_doAll {
+	cursor:pointer;
+}
+/* basic positioning */
+.legend { list-style: none; }
+.legend li { float: left; margin-right: 10px; }
+.legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+/* your colors */
+.legend .goodDependency { background-color: #0000ff; }
+.legend .badDependency { background-color: #ff0000; }
+.legend .dataflowDependency {background-color: #00ff00}
