@@ -425,7 +425,6 @@ module.exports = {
       {
         // then we should show the dependencies of this node
         //edge [id = 1123, color="red",penwidth="3.0"]; 2 -> c -> e -> a [weight=1]
-<<<<<<< HEAD
         if(nodes[expandeNodeDependency]._depGoodDotString != "")
         {
           digraph += '{edge [id = ED' + expandeNodeDependency + ', color="blue",penwidth="3.0"]; ' + nodes[expandeNodeDependency]._depGoodDotString + "}"
@@ -441,11 +440,6 @@ module.exports = {
         })
         highlightBorder += "}";
         digraph += highlightBorder;
-=======
-
-        dependencyDOT = '{edge [id = ED' + expandDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandDependency]._depDotString + "}"
-
->>>>>>> master
       }
       // 
       digraph += "\n}";
@@ -590,15 +584,12 @@ module.exports = {
           label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
           label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
-<<<<<<< HEAD
           if(node._pipelineScalarValue > g_pipelineThreshold)
             label += '\n<TR><TD id = "pipeline" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf231; (' + node._pipelineScalarValue + ')</FONT></TD></TR>';
           if(node._doAllScalarValue > g_doAllThreshold)
             label += '\n<TR><TD id = "doAll" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf0ec; (' + node._doAllScalarValue + ')</FONT></TD></TR>';
           if(node._geometricDecomposition == 1)
             label += '\n<TR><TD id = "geometricDecomp" HREF=" "><FONT COLOR="' + getHeatColor() + '">&#xf2a6; </FONT></TD></TR>';
-=======
->>>>>>> master
           label += '\n</TABLE>>';
           break;
         default:
