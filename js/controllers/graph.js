@@ -451,7 +451,8 @@ module.exports = {
             console.log('DOT-File was saved');
           });
 	  
-      var svg;
+
+          var svg;
       try {
         var start = new Date().getTime();
         svg = Viz(digraph, {

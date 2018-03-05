@@ -4,6 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css">
+
   <link rel="stylesheet" href="../css/index.css">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/jstree/dist/themes/default/style.min.css" />
@@ -14,10 +17,64 @@
   <script src="../js/views/visualizer.js"></script>
   <script src="../node_modules/colresizable/colResizable-1.6.min.js"></script>
 
+  <!--slideReveal-->
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/bootstrap.css" rel="stylesheet">
+  <link href="../css/slideReveal.css" rel="stylesheet">
+  <!-- checkboxes -->
+  <link href="../css/prettify.css" rel="stylesheet">
+  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+  <script src="../js/controllers/jquery-1.js"></script>
+  <script src="../js/controllers/jquery.js"></script>
+  <script src="../js/controllers/prettify.js"></script>
   <title>DiscoPoP Visualizer</title>
 </head>
 
 <body>
+  <div id="menu-bar" style="position: fixed; width: 250px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: 0px;"
+    class="left-shadow-overlay">
+    <div class="handle">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    </div>
+    <h3>
+      SlideReveal
+      <br>
+      <small>
+        <span class="glyphicon glyphicon-info-sign"></span> Press
+        <kbd>ESC</kbd> to close</small>
+    </h3>
+    <a href="#include">How to include</a>
+    <a href="#use">How to use</a>
+    <a href="#method">Methods</a>
+    <a href="#option">Options</a>
+    <div class="sidebarElem">
+      <div class="[ form-group ]">
+        <input type="checkbox" name="fancy-checkbox-default" id="fancy-checkbox-default" autocomplete="off" onclick='handleClick(this);' checked
+        />
+        <div class="[ btn-group ]">
+          <label for="fancy-checkbox-default" class="[ btn btn-default ]">
+            <span class="[ glyphicon glyphicon-ok ]"></span>
+            <span>&nbsp;</span>
+          </label>
+          <label for="fancy-checkbox-default" class="[ btn btn-default active ]">
+            Show Code
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="sidebarElem">
+        <div class="container">
+            <div class="panel-group" id="accordion">
+              
+              
+            </div>
+        </div>
+    
+    </div>
+
+  </div>
+
   <table id="visualizer-table" border="1">
     <tr>
       <td>
@@ -47,15 +104,19 @@
                   Legend
                 </button>
                 <button class="btn btn-primary pull-right btn-sm" type="button" id="node-info-button">
-                  <span class="glyphicon glyphicon-info-sign" id="node-info-available-icon"></span> Node <span class="glyphicon glyphicon-collapse-down" id="node-info-collapse-icon"></span>
+                  <span class="glyphicon glyphicon-info-sign" id="node-info-available-icon"></span> Node
+                  <span class="glyphicon glyphicon-collapse-down" id="node-info-collapse-icon"></span>
                 </button>
                 <button class="btn btn-primary pull-right btn-sm" type="button" id="reset-graph-button">
                   Reset Graph
                 </button>
                 <ul class="legend">
-                  <li><span class="goodDependency"></span>posoitive dependency</li>
-                  <li><span class="badDependency"></span>negative dependency</li>
-                  <li><span class="dataflowDependency"></span>Data flow</li>
+                  <li>
+                    <span class="goodDependency"></span>positive dependency</li>
+                  <li>
+                    <span class="badDependency"></span>negative dependency</li>
+                  <li>
+                    <span class="dataflowDependency"></span>Data flow</li>
                 </ul>
                 <div class="tab-content">
                   <div id="flow-graph-container" class="tab-pane fade in active">
@@ -140,13 +201,15 @@
                           <!-- function -->
                           <g id="node2" class="node function-node">
                             <title>function</title>
-                            <polygon fill="none" stroke="black" points="104.676,-18 78.534,-36 26.2499,-36 0.10785,-18 26.2499,-2.84217e-14 78.534,-0 104.676,-18" />
+                            <polygon fill="none" stroke="black" points="104.676,-18 78.534,-36 26.2499,-36 0.10785,-18 26.2499,-2.84217e-14 78.534,-0 104.676,-18"
+                            />
                             <text text-anchor="middle" x="52.3919" y="-13.8" font-family="Times,serif" font-size="14.00">Function</text>
                           </g>
                           <!-- cu&#45;&gt;function -->
                           <g id="edge1" class="edge function-call-edge">
                             <title>cu&#45;&gt;function</title>
-                            <path fill="none" stroke="black" stroke-dasharray="1,5" d="M89.6907,-88.9021C80.6643,-84.2416 72.2242,-78.3187 65.6205,-70.8 59.6984,-64.0572 56.3626,-55.0187 54.5044,-46.3803" />
+                            <path fill="none" stroke="black" stroke-dasharray="1,5" d="M89.6907,-88.9021C80.6643,-84.2416 72.2242,-78.3187 65.6205,-70.8 59.6984,-64.0572 56.3626,-55.0187 54.5044,-46.3803"
+                            />
                             <polygon fill="black" stroke="black" points="57.917,-45.5526 52.8959,-36.2232 51.0032,-46.6475 57.917,-45.5526" />
                             <text text-anchor="middle" x="105.278" y="-58.2" font-family="Times,serif" font-size="14.00">Function&#45;Call</text>
                           </g>
@@ -159,14 +222,16 @@
                           <!-- cu&#45;&gt;loop -->
                           <g id="edge3" class="edge dependency-edge">
                             <title>cu&#45;&gt;loop</title>
-                            <path fill="none" stroke="black" d="M148.115,-88.5375C145.897,-77.9897 144.938,-64.5473 150.427,-54 154.312,-46.5355 160.598,-40.3331 167.421,-35.3283" />
+                            <path fill="none" stroke="black" d="M148.115,-88.5375C145.897,-77.9897 144.938,-64.5473 150.427,-54 154.312,-46.5355 160.598,-40.3331 167.421,-35.3283"
+                            />
                             <polygon fill="black" stroke="black" points="169.727,-38.0043 176.21,-29.6246 165.916,-32.1324 169.727,-38.0043" />
                             <text text-anchor="middle" x="186.374" y="-58.2" font-family="Times,serif" font-size="14.00">Dependency</text>
                           </g>
                           <!-- loop&#45;&gt;cu -->
                           <g id="edge2" class="edge flow-edge">
                             <title>loop&#45;&gt;cu</title>
-                            <path fill="none" stroke="black" d="M215.223,-34.0106C223.856,-44.6297 231.72,-59.017 224.392,-70.8 221.606,-75.2801 218.058,-79.2036 214.041,-82.6367" />
+                            <path fill="none" stroke="black" d="M215.223,-34.0106C223.856,-44.6297 231.72,-59.017 224.392,-70.8 221.606,-75.2801 218.058,-79.2036 214.041,-82.6367"
+                            />
                             <polygon fill="black" stroke="black" points="211.82,-79.9249 205.812,-88.6518 215.95,-85.5761 211.82,-79.9249" />
                             <text text-anchor="middle" x="256.325" y="-58.2" font-family="Times,serif" font-size="14.00">Data&#45;Flow</text>
                           </g>
@@ -208,13 +273,16 @@
                           Click on a dependency-edge's variable to highlight the accesses to the variable in the code
                         </li>
                         <li>
-                          <span class="glyphicon glyphicon-save"></span>: represents a write to a variable. Click: display the line on which that write occurs in the code.
+                          <span class="glyphicon glyphicon-save"></span>: represents a write to a variable. Click: display the line on which that write occurs in
+                          the code.
                         </li>
                         <li>
-                          <span class="glyphicon glyphicon-open"></span>: represents a read from a variable. Click: display the line on which that read occurs in the code.
+                          <span class="glyphicon glyphicon-open"></span>: represents a read from a variable. Click: display the line on which that read occurs in
+                          the code.
                         </li>
                         <li>
-                          <a style "font-family: font-awesome">&#8618;</a>: represents a call to a function. Click: highlight the line on which the function-call occurs in the code.
+                          <a style "font-family: font-awesome">&#8618;</a>: represents a call to a function. Click: highlight the line on which the function-call
+                          occurs in the code.
                         </li>
                         <li>
                           <span style="font-family: font-awesome">&#xf06d;</span>: its color represents the heat-level of the node in relation to the others.
@@ -232,19 +300,23 @@
                       <h4>Code</h4>
                       <ul>
                         <li>
-                          On the Files tab, select a file to open it. You may right-click on any line of code in the file to find the Computational-Unit that contains it.
+                          On the Files tab, select a file to open it. You may right-click on any line of code in the file to find the Computational-Unit
+                          that contains it.
                         </li>
                         <li>
-                          A line-number marked with <span class="editor_write_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a write on the variable
+                          A line-number marked with
+                          <span class="editor_write_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a write on the variable
                         </li>
                         <li>
-                          A line-number marked with <span class="editor_read_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a read on the variable
+                          A line-number marked with
+                          <span class="editor_read_decoration">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span> signifies a read on the variable
                         </li>
                       </ul>
                       <h4>Preferences</h4>
                       <ul>
                         <li>
-                          You may change the maximum level of ancestry visible in the graph, as well as some color-settings for the graph by clicking on Preferences and then Graph, or pressing ctrl+G.
+                          You may change the maximum level of ancestry visible in the graph, as well as some color-settings for the graph by clicking
+                          on Preferences and then Graph, or pressing ctrl+G.
                         </li>
                         <li>
                           You may change some styling-settings for the code-viewer by clicking on Preferences and then Code, or pressing ctrl+E.
@@ -261,9 +333,40 @@
     </tr>
   </table>
 </body>
-
 <script>
-  var onSampleResized = function(e) {
+  $(function ($) {
+
+    prettyPrint();
+
+
+
+    var slider = $("#menu-bar").slideReveal({
+      // width: 100,
+      push: false,
+      position: "right",
+      // speed: 600,
+      trigger: $(".handle"),
+      // autoEscape: false,
+
+      shown: function (obj) {
+        obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
+        obj.addClass("left-shadow-overlay");
+      },
+      hidden: function (obj) {
+        obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
+        obj.removeClass("left-shadow-overlay");
+      }
+    });
+
+
+
+    var slider = $("#menu-bar").slideReveal({
+      trigger: $("#trigger")
+    });
+  });
+</script>
+<script>
+  var onSampleResized = function (e) {
     var columns = $(e.currentTarget).find("td");
   };
   $("#visualizer-table").colResizable();

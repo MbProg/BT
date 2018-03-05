@@ -18,6 +18,7 @@ var nodes;
 var fileMaps;
 var fileNodeIntervalTrees;
 var graphController;
+var panelSettings = null;
 
 const dialog = require('electron').dialog;
 console.log("Hello");
@@ -34,6 +35,28 @@ var template = [{
     accelerator: 'F12',
     click: function(item, focusedWindow) {
       mainWindow.webContents.openDevTools();
+    }
+  }, {
+    label: 'Settings',
+    accelerator: 'F5',
+    type: 'checkbox',
+    checked: true, // Fetch saved cookie in app
+    click: function(item, focusedWindow) {
+      if (panelSettings) {
+        panelSettings.hide();
+        return;
+      }
+      graphSettingsWindow = new BrowserWindow({
+        width: 600,
+        height: 350
+      });
+      graphSettingsWindow.setMenu(null);
+      graphSettingsWindow.setAlwaysOnTop(true);
+      graphSettingsWindow.loadURL('file://' + __dirname + '/windows/graphSettings.html');
+      graphSettingsWindow.on('closed', function() {
+        graphSettingsWindow = null;
+      });
+      //graphSettingsWindow.webContents.openDevTools();
     }
   },
   {
@@ -106,7 +129,6 @@ app.on('ready', function() {
     height: 600
   });
 
-  console.log("Fuck you");
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/windows/index.html');
   mainWindow.maximize();

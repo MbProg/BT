@@ -6,6 +6,7 @@ var $ = global.jQuery = window.$ = require('jquery');
 window.$.ui = require('jquery-ui');
 
 require('bootstrap');
+var graphSettingsWindow = null;
 var BootstrapMenu = require('bootstrap-menu');
 var Handlebars = require('handlebars');
 var EditorController = require('../js/controllers/editor');
@@ -488,4 +489,18 @@ function highlightGraphNode(node) {
 	console.log('higlighting', nodeData[node.attr("id")]);
 	node.addClass('selected-node');
 	colorGraph(d3.select('#graph0'));
+}
+
+function handleClick(cb) {
+	var x = document.getElementById("code-view");
+   if (x.style.display === "none") {
+	   x.style.display = "block";
+   } else {
+	   x.style.display = "none";
+   }
+// display("Clicked, new value = " + cb.checked);
+}
+
+function chbPipelineClicked(cb) {
+	alert('Hello')
 }

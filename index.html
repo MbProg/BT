@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--slideReveal-->
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/slideReveal.css" rel="stylesheet">
+<!-- checkboxes -->
+<link href="css/prettify.css" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="js/controllers/jquery-1.js"></script>
+<script src="js/controllers/jquery.js"></script>
+<script src="js/controllers/prettify.js"></script>
+	</head>
+<body>
+<div id="menu-bar" style="position: fixed; width: 250px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: 0px;" class="left-shadow-overlay">
+      <div class="handle"><span class="glyphicon glyphicon-chevron-right"></span></div>
+      <h3>
+        SlideReveal<br>
+        <small><span class="glyphicon glyphicon-info-sign"></span> Press <kbd>ESC</kbd> to close</small>
+      </h3>
+      <a href="#include">How to include</a>
+      <a href="#use">How to use</a>
+      <a href="#method">Methods</a>
+      <a href="#option">Options</a>
+	  <div class="sidebarElem">
+		<div class="[ form-group ]">
+			<input type="checkbox" name="fancy-checkbox-default" id="fancy-checkbox-default" autocomplete="off" onclick='handleClick(this);'/>
+			<div class="[ btn-group ]">
+				<label for="fancy-checkbox-default" class="[ btn btn-default ]">
+					<span class="[ glyphicon glyphicon-ok ]"></span>
+					<span>&nbsp;</span>
+				</label>
+				<label for="fancy-checkbox-default" class="[ btn btn-default active ]">
+					Show Code
+				</label>
+			</div>
+		</div>
+	    </div>
+	  
+    </div>
+	
+	<div id="myDIV">
+This is my DIV element.
+</div>
+</body>
+<script>
+
+</script>
+	<script>
+	function handleClick(cb) {
+	 var x = document.getElementById("myDIV");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+ // display("Clicked, new value = " + cb.checked);
+}
+
+$(function($) {
+
+        prettyPrint();
+
+	
+
+        var slider = $("#menu-bar").slideReveal({
+          // width: 100,
+          push: false,
+          position: "right",
+          // speed: 600,
+          trigger: $(".handle"),
+          // autoEscape: false,
+		  
+          shown: function(obj){
+            obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
+            obj.addClass("left-shadow-overlay");
+          },
+          hidden: function(obj){
+            obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
+            obj.removeClass("left-shadow-overlay");
+          }
+        });
+
+    
+    
+  var slider = $("#menu-bar").slideReveal({
+  	trigger: $("#trigger")
+  });
+});
+</script>
+</html>
