@@ -17,7 +17,7 @@
   var SlideReveal = function($el, options) {
     // Define default setting
     var setting = {
-      width: 250,
+      width: 350,
       push: true,
       position: "left",
       speed: 300, //ms

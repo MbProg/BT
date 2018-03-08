@@ -501,6 +501,14 @@ function handleClick(cb) {
 // display("Clicked, new value = " + cb.checked);
 }
 
+function showWeakDependencies(cb){
+	ipc.send('showWeakDependency',cb.checked)
+}
+function showPipelines(cb){
+	ipc.send('showParallelPatterns');
+}
+
 function chbPipelineClicked(cb) {
 	alert('Hello')
 }
+

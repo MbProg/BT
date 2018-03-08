@@ -42,6 +42,7 @@ class Node {
     this._pipelineScalarValue = pipelineScalarValue;
     this._doAllScalarValue = doAllScalarValue;
     this._geometricDecomposition = geometricDecomposition;
+    this._flagged = false;
   }
 
   /**
@@ -61,6 +62,13 @@ class Node {
     this.parents.push(node);
   }
 
+  /**
+   * A boolean to mark nodes -> used for marking the nodes that should be highlighted in the graph
+   * @param {flag} flag 
+   */
+  setFlag(flag){
+    this._flagged = flag;
+  }
   /**
    * The id of the file which the node refers to
    * @type {number}
