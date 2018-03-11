@@ -132,6 +132,65 @@ ipc.on('init-listeners', function (event) {
 	$("#show-legend-button").on('click', function () {
 		$("#legend-table").slideToggle("medium", function () { });
 	});
+	function getNodes(option){
+		
+		var tablescripts = [];
+		var pipelineThreshold = configuration.readSetting('pipelineThreshold')
+		var doAllThreshold = configuration.readSetting('doAllThreshold');
+		_.each(nodeData,function(node){
+			if ((option & 1) && node._pipelineScalarValue >=pipelineThreshold)
+			{
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Pipeline</td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
+				tablescripts.push(s);
+			}
+			if ((option & 2) && node._doAllScalarValue >=doAllThreshold)
+			{
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Do All</td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
+				tablescripts.push(s);
+			}
+			if ((option & 4) && node._geometricDecomposition == 1)
+			{
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Geometric Decomposition</td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
+				tablescripts.push(s);
+			}
+
+		})
+		return tablescripts;			
+	}
+
+	$("#btnPatternSearch").on('click', function () {
+		option = $("#selPatternSearch option:selected").index();
+		if (!option)
+		{
+			return;
+		}
+		else{
+			if(option != 4){option = 1 <<(option-1);}
+			else{option = 7;}
+			
+			$("#patternTable tbody tr").remove();
+			var scripts = getNodes(option);
+			_.each(scripts,function(script){
+				$('#patternTable').append(script)
+			})
+		}
+	});
+
+	$("#patternTableBody").on('click',function(e){
+		e = e || window.event;
+		var data = [];
+		var target = e.srcElement || e.target;
+		while (target && target.nodeName !== "TR") {
+			target = target.parentNode;
+			target.style.background = "#F3ECEC";
+		}
+		if (target) {
+			var cells = target.getElementsByTagName("td");
+			data.push(cells[0].innerHTML);
+			ipc.send('showANode',cells[0].innerHTML);
+
+		}
+	})
 
 	// Select a file from file-tree
 	$('#file-select-container').on("changed.jstree", function (e, data) {

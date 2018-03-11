@@ -1,0 +1,21 @@
+select.input-smp {
+    height: 22px;
+    line-height: 22px;
+    font-size: 12px;
+}
+
+button#btnShowAllNodes{
+    margin-top: 5px;
+}
+.col-auto{
+margin-top: 10px;
+}
+
+label{
+    color: rgb(49, 49, 49)
+}
+
+label#lblClickNode {
+    font-weight: 100;
+    font-size: 12px;
+}

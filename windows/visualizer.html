@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/index.css">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/jstree/dist/themes/default/style.min.css" />
-
+  <link rel="stylesheet" href="../css/formStyles.css">
 
   <script src="../js/external/ace/ace.js" type="text/javascript"></script>
   <script src="../js/external/ace/ext-beautify.js" type="text/javascript"></script>
@@ -26,29 +26,110 @@
   <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
   <script src="../js/controllers/jquery-1.js"></script>
-  <script src="../js/controllers/jquery.js"></script>
+  <script src="../js/controllers/jqueryslidereveal.js"></script>
   <script src="../js/controllers/prettify.js"></script>
   <title>DiscoPoP Visualizer</title>
+  <!-- settingspanel -->
+  <link href="../css/settingspanel.css" rel="stylesheet">
+ 
+
 </head>
 
 <body>
   <div id="menu-bar" style="position: fixed; width: 350px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: 0px;"
     class="left-shadow-overlay">
     <div class="handle">
-      <span class="glyphicon glyphicon-chevron-right"></span>
+      <span class="glyphicon glyphicon-chevron-right" id="glyphicon1"></span>      
+      <table>
+        <tbody>
+          <tr>
+            <td><span class="glyphicon glyphicon glyphicon-list-alt" id="glyphicon_codeContainer"></span></td>
+            <td class="td_line" id="td_line_codeContainer"></td>
+          </tr>
+        </tbody>
+      </table>
+      <table>
+        <tbody>
+          <tr>
+            <td><span class="glyphicon glyphicon-folder-open" id="glyphicon_fileContainer"></span></td>
+            <td class="td_line" id="td_line_fileContainer"></td>
+          </tr>
+        </tbody>
+      </table>
+      <table>
+        <tbody>
+          <tr>
+            <td><span class="glyphicon glyphicon glyphicon-cog" id="glyphicon_settings" ></span></td>
+            <td class="td_line" id="td_line_settings"></td>
+          </tr>
+        </tbody>
+      </table>      
+      
     </div>
-    <h3>
-      SlideReveal
+    <h5>
       <br>
       <small>
         <span class="glyphicon glyphicon-info-sign"></span> Press
         <kbd>ESC</kbd> to close</small>
-    </h3>
-    <a href="#include">How to include</a>
+    </h5>
+    <div id="code-view">
+
+      <div class="tab-content">
+        <div id="code-container" class="tab-pane fade in active">
+          <div id="ace-editor"></div>
+        </div>
+        <div id="file-select-container" class="tab-pane fade"></div>
+        <div id="settings-container" class="tab-pane fade">
+          <div class="container">
+              <div class="form-row">
+                  <div class="form-group col-md-2">
+                      <select class="form-control input-smp" id="selPatternSearch">
+                          <option style="display:none;" selected>Select a pattern to search for...</option>
+                          <option>All Pipeline</option>
+                          <option>All Do-All</option>
+                          <option>All Geometric Decomposition</option>
+                          <option>All Patterns</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="form-group col-md-2">
+                  <button type="button" class="btn btn-primary" id="btnPatternSearch">Search</button>
+              </div>   
+          </div>
+          <input type="text" id="txtPatternSearch" onkeyup="patternFilter()" placeholder="Filter for a field.." title="Type in a name">
+          <label class="form-check-label" for="cbNegDependencies" id="lblClickNode">Click on a node to show it on the graph:</label>
+          <table class="scrollableTable" id="patternTable">
+            <thead>
+              <tr class="header">
+                <th style="width:20%;" onclick="sortTable(0)">Node.Id</th>
+                <th style="width:70%;" onclick="sortTable(1)">Pattern</th>
+                <th style="width:10%;" onclick="sortTable(2)">Scalar</th>
+              </tr>
+            </thead>
+            <tbody id="patternTableBody">
+
+ 
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnShowAllNodes">Show all nodes in the graph</button>
+            <div class="col-auto">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="cbAllDependencies">
+                <label class="form-check-label" for="cbAllDependencies">Show all dependencies</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="cbNegDependencies">
+                <label class="form-check-label" for="cbNegDependencies">Show negative dependencies</label>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <!-- <a href="#include">How to include</a>
     <a href="#use">How to use</a>
     <a href="#method">Methods</a>
-    <a href="#option">Options</a>
-    <div class="sidebarElem">
+    <a href="#option">Options</a> -->
+    <!-- <div class="sidebarElem">
       <div class="[ form-group ]">
         <input type="checkbox" name="fancy-checkbox-default" id="fancy-checkbox-default" autocomplete="off" onclick='handleClick(this);' checked
         />
@@ -62,7 +143,7 @@
           </label>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- <div class="sidebarElem">
       <div class="[ form-group ]">
         <input type="checkbox" name="fancy-cbShowPipelines" id="fancy-cbShowPipelines" autocomplete="off" onclick='showPipelines(this);' checked
@@ -78,7 +159,7 @@
         </div>
       </div>
     </div>  -->
-    <div class="sidebarElem">
+    <!-- <div class="sidebarElem">
       <div class="[ form-group ]">
         <button type="button" class="btn btn-default" onclick="showPipelines()">Show Pipelines</button>
       </div>
@@ -103,29 +184,14 @@
               
             </div>
         </div>
-  </div>
+  </div> -->
 
   </div>
 
   <table id="visualizer-table" border="1">
     <tr>
       <td>
-        <div id="code-view">
-          <ul class="nav nav-pills">
-            <li class="active col-sm-5">
-              <a data-toggle="pill" href="#code-container" id="code-container-tab"></a>
-            </li>
-            <li class="col-sm-5">
-              <a data-toggle="pill" href="#file-select-container" id="file-select-tab">Files</a>
-            </li>
-          </ul>
-          <div class="tab-content">
-            <div id="code-container" class="tab-pane fade in active">
-              <div id="ace-editor"></div>
-            </div>
-            <div id="file-select-container" class="tab-pane fade"></div>
-          </div>
-        </div>
+
       </td>
       <td>
         <table style="width: 100%; height: 100%;" border="1">
@@ -364,8 +430,20 @@
       </td>
     </tr>
   </table>
+
+
+  
 </body>
+
+<!--
+  SlideReveal events 
+ -->
 <script>
+
+  ////////////////////////////////////////////////////////////////
+  //                SlideReveal Events                          //
+  ////////////////////////////////////////////////////////////////
+
   $(function ($) {
 
     prettyPrint();
@@ -374,34 +452,116 @@
 
     var slider = $("#menu-bar").slideReveal({
       // width: 100,
-      push: false,
+      push: true,
       position: "right",
       // speed: 600,
-      trigger: $(".handle"),
+      trigger: $("#glyphicon1"),
       // autoEscape: false,
 
       shown: function (obj) {
-        obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
-        obj.addClass("left-shadow-overlay");
+        // obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
+        // obj.find(".handle").html('<span class="glyphicon glyphicon glyphicon glyphicon-cog"></span>');
+        // obj.addClass("left-shadow-overlay");
       },
       hidden: function (obj) {
-        obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
-        obj.removeClass("left-shadow-overlay");
+        // obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
+        // obj.removeClass("left-shadow-overlay");
       }
     });
 
 
 
-    var slider = $("#menu-bar").slideReveal({
-      trigger: $("#trigger")
-    });
   });
-</script>
-<script>
-  var onSampleResized = function (e) {
-    var columns = $(e.currentTarget).find("td");
-  };
-  $("#visualizer-table").colResizable();
+  
+  $('span#glyphicon1').click(function(){
+    var rightIcon = document.getElementById("glyphicon1");
+    var filecontainer = document.getElementById("file-select-container");
+    var codecontainier = document.getElementById("code-container");
+    var settingscontainer = document.getElementById("settings-container");
+    // convert right to left or opp
+    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    rightIcon.classList.remove("glyphicon-chevron-right");
+    rightIcon.classList.add("glyphicon-chevron-left");
+    codecontainier.classList.add("active");
+    codecontainier.classList.add("in");
+    document.getElementById("td_line_codeContainer").style.borderLeft = "#524E4E solid 6px"
+    }else{
+      rightIcon.classList.add("glyphicon-chevron-right");
+      rightIcon.classList.remove("glyphicon-chevron-left");
+      codecontainier.classList.remove("active");
+      codecontainier.classList.remove("in");
+      document.getElementById("td_line_codeContainer").style.borderLeft = "#2E2E2E solid 6px"
+    }
+
+    // toogle the grey rectangles next to the icons
+    document.getElementById("td_line_fileContainer").style.borderLeft = "#2E2E2E solid 6px"
+    document.getElementById("td_line_settings").style.borderLeft = "#2E2E2E solid 6px"
+    // activate the code container
+    settingscontainer.classList.remove("active");
+    settingscontainer.classList.remove("in");
+    filecontainer.classList.remove("active");
+    filecontainer.classList.remove("in");
+  })
+  $('span#glyphicon_codeContainer').click(function(){
+    var filecontainer = document.getElementById("file-select-container");
+    var codecontainier = document.getElementById("code-container");
+    var settingscontainer = document.getElementById("settings-container");
+    var rightIcon = document.getElementById("glyphicon1");
+    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    rightIcon.click();
+      }
+    // toogle the grey rectangles next to the icons
+    document.getElementById("td_line_codeContainer").style.borderLeft = "#524E4E solid 6px"
+    document.getElementById("td_line_fileContainer").style.borderLeft = "#2E2E2E solid 6px"
+    document.getElementById("td_line_settings").style.borderLeft = "#2E2E2E solid 6px"
+    // activate the code container
+    settingscontainer.classList.remove("active");
+    settingscontainer.classList.remove("in");
+    filecontainer.classList.remove("active");
+    filecontainer.classList.remove("in");
+    codecontainier.classList.add("active");
+    codecontainier.classList.add("in");
+  })
+  $('span#glyphicon_fileContainer').click(function(){
+    var filecontainer = document.getElementById("file-select-container");
+    var codecontainier = document.getElementById("code-container");
+    var settingscontainer = document.getElementById("settings-container");
+    var rightIcon = document.getElementById("glyphicon1");
+    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    rightIcon.click();
+      }
+    // toogle the grey rectangles next to the icons
+    document.getElementById("td_line_fileContainer").style.borderLeft = "#524E4E solid 6px"
+    document.getElementById("td_line_codeContainer").style.borderLeft = "#2E2E2E solid 6px"
+    document.getElementById("td_line_settings").style.borderLeft = "#2E2E2E solid 6px"
+    // activate the folder panel
+    filecontainer.classList.add("active");
+    filecontainer.classList.add("in");
+    codecontainier.classList.remove("active");
+    codecontainier.classList.remove("in");
+    settingscontainer.classList.remove("active");
+    settingscontainer.classList.remove("in");
+  })
+  $('span#glyphicon_settings').click(function(){
+    var filecontainer = document.getElementById("file-select-container");
+    var codecontainier = document.getElementById("code-container");
+    var settingscontainer = document.getElementById("settings-container");
+    var rightIcon = document.getElementById("glyphicon1");
+    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    rightIcon.click();
+      }
+    // toogle the grey rectangles next to the icons
+    document.getElementById("td_line_fileContainer").style.borderLeft = "#2E2E2E solid 6px"
+    document.getElementById("td_line_codeContainer").style.borderLeft = "#2E2E2E solid 6px"
+    document.getElementById("td_line_settings").style.borderLeft = "#524E4E solid 6px"
+    // activate the folder panel
+    filecontainer.classList.remove("active");
+    filecontainer.classList.remove("in");
+    codecontainier.classList.remove("active");
+    codecontainier.classList.remove("in");
+    settingscontainer.classList.add("active");
+    settingscontainer.classList.add("in");
+  })
 </script>
 
 <script type="text/x-handlebars-template" id="clusterLabelTemplate">
@@ -422,6 +582,90 @@
       </td>
     </tr>
   </table>
+</script>
+
+
+<script>
+
+  ////////////////////////////////////////////////////////////////
+  //                Settigs Panel Events                        //
+  ////////////////////////////////////////////////////////////////
+
+  function patternFilter() {
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("txtPatternSearch");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("patternTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+          td1 = tr[i].getElementsByTagName("td")[0];
+          td2 = tr[i].getElementsByTagName("td")[1];
+          td3 = tr[i].getElementsByTagName("td")[2];
+          if (td1 && td2 && td3) {
+            if (td1.innerHTML.toUpperCase().indexOf(filter) > -1 || 
+            td2.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+            td3.innerHTML.toUpperCase().indexOf(filter) > -1 ) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }       
+        }
+      }
+  function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("patternTable");
+    switching = true;
+    // Set the sorting direction to ascending:
+    dir = "asc"; 
+    /* Make a loop that will continue until
+    no switching has been done: */
+    while (switching) {
+      // Start by saying: no switching is done:
+      switching = false;
+      rows = table.getElementsByTagName("TR");
+      /* Loop through all table rows (except the
+      first, which contains table headers): */
+      for (i = 1; i < (rows.length - 1); i++) {
+        // Start by saying there should be no switching:
+        shouldSwitch = false;
+        /* Get the two elements you want to compare,
+        one from current row and one from the next: */
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+        /* Check if the two rows should switch place,
+        based on the direction, asc or desc: */
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch= true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch= true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        /* If a switch has been marked, make the switch
+        and mark that a switch has been done: */
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        // Each time a switch is done, increase this count by 1:
+        switchcount ++; 
+      } else {
+        /* If no switching has been done AND the direction is "asc",
+        set the direction to "desc" and run the while loop again. */
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
 </script>
 
 </html>

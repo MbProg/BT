@@ -20,6 +20,70 @@ class ExpansionPath {
     this._patternDetectedNodes = [];
     this._rootNodes = rootNodes;
   }
+  expandToNodes(nodeIds){
+    // use DFS to expand all nodes which are in the path to a node with pipeline    
+    _.each(this._rootNodes,(root)=>{
+      this.expandToNodesSub(root,nodeIds);
+    })
+  }
+  expandToNodesSub(node,nodeIds)
+  {
+    this.addNode(node);
+    node.expand();
+    let nodefound = false
+    _.each(node.children,(child)=>{
+      nodefound |= this.expandToNodesSub(child,nodeIds);
+    })
+    let found = nodeIds.indexOf( node.originalId)
+    if (nodefound || found >=0)
+    {
+      if (found >=0)
+      {
+        this._patternDetectedNodes.push(node);
+        _.each(node.children,(child)=>{
+          child.setFlag(true);
+        })
+      }
+    }
+    else
+    {
+      this.removeNode(node);
+      node.collapse()
+    }
+    return node.expanded;
+  }
+  expandToANode(nodeId)
+  {
+    // use DFS to expand all nodes which are in the path to a node with pipeline    
+    _.each(this._rootNodes,(root)=>{
+      this.expandToANodeSub(root,nodeId);
+    })
+  }
+  expandToANodeSub(node,nodeId)
+  {
+    this.addNode(node);
+    node.expand();
+    let nodefound = false
+    _.each(node.children,(child)=>{
+      nodefound |= this.expandToANodeSub(child,nodeId);
+    })
+    if (nodefound || node.originalId == nodeId)
+    {
+      if (node.originalId == nodeId)
+      {
+        this._patternDetectedNodes.push(node);
+        _.each(node.children,(child)=>{
+          child.setFlag(true);
+        })
+      }
+    }
+    else
+    {
+      this.removeNode(node);
+      node.collapse()
+    }
+    return node.expanded||(nodefound || node.originalId == nodeId);
+  }
 
   expandPipelineNodes()
   {
@@ -61,7 +125,8 @@ class ExpansionPath {
   reset() {
     this._expandedNodesPerLevel = [];
     this._expansionLevelsPerNode = {};
-    this._visibleLevelsPerNode = {}
+    this._visibleLevelsPerNode = {};
+    this._patternDetectedNodes = [];
   }
 
   getVisibleRootNodes() {
@@ -257,9 +322,20 @@ module.exports = {
       expansionPath.reset();
       expansionPath.expandPipelineNodes()
       event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
-
     });
 
+    ipc.on('showANode',function(event,searchedNode){
+      expansionPath.reset();
+      expansionPath.expandToANode(searchedNode)
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+    });
+
+    ipc.on('showNodes',function(event,searchedNodesId){
+      expansionPath.reset();
+      expansionPath.expandToNodes(searchedNodesId)
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+    });
+    
     ipc.on('fullGraph', function(event) {
       var node;
       var stack = [];
@@ -668,8 +744,8 @@ module.exports = {
           label += '\n</TABLE>>';
           break;
         case 2:
-          if (node.expanded){label += '\n<TR><TD>Loop</TD></TR>';}
-          label += '\n<TR><TD>' + node.originalId + '</TD></TR>';
+          if (node.expanded){label +=  '\n<TR><TD>' + node.originalId + '</TD><TD> (Loop)</TD></TR>';}
+          else{label += '\n<TR><TD>' + node.originalId + '</TD></TR>';}
           // label += '\n<TR><TD>[' + node.startLine + '-' + node.endLine + ']</TD></TR>';
           // label += '\n<TR><TD><FONT COLOR="' + getHeatColor() + '">&#xf06d;</FONT></TD></TR>';
           // if(node._pipelineScalarValue > g_pipelineThreshold)

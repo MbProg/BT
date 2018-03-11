@@ -135,7 +135,7 @@ class EditorController {
     this._editor.setReadOnly(true);
     this._editor.setHighlightActiveLine(false);
     this._editor.setOptions({
-      fontSize: "14pt",
+      fontSize: "11pt",
       wrapBehavioursEnabled: true,
       animatedScroll: true
     });

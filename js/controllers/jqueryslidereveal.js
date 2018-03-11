@@ -14,6 +14,12 @@
     return ($el.width() + paddingLeft + paddingRight) + "px";
   };
 
+  var sidePositionInt = function($el) {
+    var paddingLeft = getPadding($el, 'left');
+    var paddingRight = getPadding($el, 'right');
+    return ($el.width() + paddingLeft + paddingRight) ;
+  };
+
   var SlideReveal = function($el, options) {
     // Define default setting
     var setting = {
@@ -126,9 +132,13 @@
       $el.css(setting.position, "0px");
       if (setting.push) {
         if (setting.position === "left") {
-          $("body").css("left", sidePosition($el));
+           $("body").css("left", sidePosition($el));
+          // $("body").css("width", "+" + sidePosition($el));
+          // $("body").css("width", "+=350px");
         } else {
-          $("body").css("left", "-" + sidePosition($el));
+          // $("body").css("width", "-=" + sidePosition($el));
+          $("body").css("width", "-="+ sidePosition($el));
+          // $("body").css("left", "-" + sidePosition($el));
         }
       }
       $el.data("slide-reveal", true);
@@ -150,7 +160,8 @@
 
       // hide the panel
       if (setting.push) {
-        $("body").css("left", "0px");
+        // $("body").css("left", "0px");
+        $("body").css("width", "+="+ sidePosition($el));
       }
       $el.css(setting.position, "-" + sidePosition($el));
       $el.data("slide-reveal", false);
