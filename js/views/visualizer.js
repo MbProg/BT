@@ -45,6 +45,53 @@ ipc.on('load-data', function (event, data) {
  */
 ipc.on('update-graph', function (event, svg) {
 	$("#flow-graph-container").html(svg);
+	// first blink by animation the cluster
+	var path = document.getElementById('3').getElementsByTagName('path')[0]
+	path.setAttribute("id", "pathCluster3");
+	var newElement = '<animate id="myAnimation" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>'
+	path.insertAdjacentHTML( 'afterbegin', newElement );
+
+	// now move circle on the path 
+	var g8t3 = document.getElementById('8t4');
+	var path = document.getElementById('8t4').getElementsByTagName('path')[0]
+	path.setAttribute("id", "path8t4");
+	var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation8t4" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path8t4"></mpath></animateMotion></circle>'
+	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+
+	// now move circle on the path 
+	var g8t3 = document.getElementById('4t5');
+	var path = document.getElementById('4t5').getElementsByTagName('path')[0]
+	path.setAttribute("id", "path4t5");
+	var circleAnim = ' <circle r="1.5" fill="green"><animateMotion id="myMoveAnimation4t5" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path4t5"></mpath></animateMotion></circle>'
+	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+
+	// now move circle on the path 
+	var g8t3 = document.getElementById('5t6');
+	var path = document.getElementById('5t6').getElementsByTagName('path')[0]
+	path.setAttribute("id", "path5t6");
+	var circleAnim = ' <circle r="1.2" fill="green"><animateMotion id="myMoveAnimation5t6" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path5t6"></mpath></animateMotion></circle>'
+	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// now move circle on the path 
+	var g8t3 = document.getElementById('6t7');
+	var path = document.getElementById('6t7').getElementsByTagName('path')[0]
+	path.setAttribute("id", "path6t7");
+	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path6t7"></mpath></animateMotion></circle>'
+	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// now move circle on the path 
+	var g8t3 = document.getElementById('7t8');
+	var path = document.getElementById('7t8').getElementsByTagName('path')[0]
+	path.setAttribute("id", "path7t8");
+	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
+	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	document.getElementById("myAnimation").beginElement();
+	document.getElementById("myMoveAnimation8t4").beginElement();
+	document.getElementById("myMoveAnimation4t5").beginElement();
+	document.getElementById("myMoveAnimation5t6").beginElement();	
+	document.getElementById("myMoveAnimation6t7").beginElement();	
+	document.getElementById("myMoveAnimation7t8").beginElement();	
+	
+	// $("#3").find("path").append('<animate id="animateCluster" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="indefinite"></animate>');
+	// $("#animateCluster").beginElement();
 	var svg = d3.select("#flow-graph-container svg");
 	var inner = d3.select("#graph0");
 	var currentScale, currentTranslate;
@@ -174,6 +221,29 @@ ipc.on('init-listeners', function (event) {
 				$('#patternTable').append(script)
 			})
 		}
+	});
+
+	$("#btnResetAllNodes").on('click', function () {
+		var trs = document.querySelectorAll('#patternTable tbody tr'), i;
+		for(i = 0; i < trs.length; ++i) {
+			// do something here
+			trs[i].style.background = "#FFFFFF"
+		}
+		ipc.send('resetNodes');
+	});
+
+	$("#btnShowAllNodes").on("click", function(){
+		var tds = document.querySelectorAll('#patternTable tbody tr'), i;
+		var nodeIds = [];
+		if(!tds.length){return;}			
+		for(i = 0; i < tds.length; ++i) {
+			// do something here
+			tds[i].style.background = "#F3ECEC"
+			var cells = tds[i].getElementsByTagName("td");
+			nodeIds.push(cells[0].innerHTML);
+		}
+		ipc.send('showAllNodes',nodeIds);
+
 	});
 
 	$("#patternTableBody").on('click',function(e){
@@ -562,6 +632,11 @@ function handleClick(cb) {
 
 function showWeakDependencies(cb){
 	ipc.send('showWeakDependency',cb.checked)
+}
+
+function showAllDependencies(cb){
+	$('#cbNegDependencies').prop('checked', cb.checked);
+	ipc.send('showAllDependencies',cb.checked)
 }
 function showPipelines(cb){
 	ipc.send('showParallelPatterns');

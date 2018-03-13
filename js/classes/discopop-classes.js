@@ -42,7 +42,7 @@ class Node {
     this._pipelineScalarValue = pipelineScalarValue;
     this._doAllScalarValue = doAllScalarValue;
     this._geometricDecomposition = geometricDecomposition;
-    this._flagged = false;
+    this._flagged = "NULL";
   }
 
   /**

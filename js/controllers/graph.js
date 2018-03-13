@@ -39,9 +39,10 @@ class ExpansionPath {
     {
       if (found >=0)
       {
+        node.setFlag("PATTERN_PARENT")
         this._patternDetectedNodes.push(node);
         _.each(node.children,(child)=>{
-          child.setFlag(true);
+          child.setFlag("PATTERN_CHILDREN");
         })
       }
     }
@@ -67,22 +68,32 @@ class ExpansionPath {
     _.each(node.children,(child)=>{
       nodefound |= this.expandToANodeSub(child,nodeId);
     })
-    if (nodefound || node.originalId == nodeId)
+    // either one of the children of this node has been founded (nodefound) or this node is the target or this node was marked before as CHILDREN
+    // if marked before as PATTERN_CHILDREN, we have to collapse it but keep it flagged
+    // if this is the target node, mark its children as PATTERN_CHILDREN and itself as PATTERN_PARENT
+    if (nodefound || node.originalId == nodeId || (node._flagged == "PATTERN_CHILDREN"))
     {
       if (node.originalId == nodeId)
       {
+        node.setFlag("PATTERN_PARENT")
         this._patternDetectedNodes.push(node);
         _.each(node.children,(child)=>{
-          child.setFlag(true);
+          child.setFlag("PATTERN_CHILDREN");
         })
       }
+      if (node._flagged == "PATTERN_CHILDREN" && !nodefound){
+        // children must be collapsed which don't have a found child node should be collapsed
+        node.collapse();
+      }
     }
+    // if this node does not fullfill any of the conditions we have to collapse it and remove it from opened node and deflag it
     else
     {
       this.removeNode(node);
-      node.collapse()
+      node.collapse();
+      node.setFlag("NULL");
     }
-    return node.expanded||(nodefound || node.originalId == nodeId);
+    return node.expanded||nodefound || node.originalId == nodeId || (node._flagged == "PATTERN_CHILDREN");
   }
 
   expandPipelineNodes()
@@ -106,13 +117,12 @@ class ExpansionPath {
     {
       if (node._pipelineScalarValue > g_pipelineThreshold)
       {
+        node.setFlag("PATTERN_PARENT")
         this._patternDetectedNodes.push(node);
         _.each(node.children,(child)=>{
-          child.setFlag(true);
+          child.setFlag("PATTERN_CHILDREN");
         })
       }
-      // this.addNode(node);
-      // node.expand()
     }
     else
     {
@@ -204,6 +214,7 @@ module.exports = {
     var expansionPath = new ExpansionPath(rootNodes);
     var expandNodeDependency;
     var showWeakDependency;
+    var showAllDependencies;
     function findFirstVisibleAncestor(node) {
       if (!node.parents.length)
         return false;
@@ -263,6 +274,12 @@ module.exports = {
       event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     })
 
+    ipc.on('showAllDependencies',function(event,expandDependency){
+      showAllDependencies = expandDependency;
+      showWeakDependency = expandDependency;
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+    })
+
     ipc.on('expandDependency', function(event,nodeId,expandDependency)
   {
     console.log("Test");
@@ -318,6 +335,15 @@ module.exports = {
       event.sender.send('update-graph', generateSvgGraph([nodes[nodeId]],expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
+    ipc.on('resetNodes',function(event){
+      expansionPath.reset();
+      _.each(nodes, function(node) {
+        node.collapse();
+        node.setFlag("NONE")
+      });
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+    });
+
     ipc.on('showParallelPatterns',function(event){
       expansionPath.reset();
       expansionPath.expandPipelineNodes()
@@ -330,6 +356,11 @@ module.exports = {
       event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
+    ipc.on('showAllNodes',function(event,nodeIds){
+      expansionPath.reset();
+      expansionPath.expandToNodes(nodeIds);
+      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+    })
     ipc.on('showNodes',function(event,searchedNodesId){
       expansionPath.reset();
       expansionPath.expandToNodes(searchedNodesId)
@@ -439,9 +470,9 @@ module.exports = {
        */
       function createNode(node,shape){
         let tempDiagraph = "";
-        if (node._flagged)
+        if (node._flagged=="PATTERN_CHILDREN")
         {
-          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#F5BDA2";fillcolor="#F5BDA2";label=' + createLabel(node) + ', style="filled"];';
+          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#F5BDA2";fillcolor="#F5BDA2";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
         }
         else
         {
@@ -528,7 +559,8 @@ module.exports = {
           });
           digraph += '\nlabel=' + createLabel(node) + ';';
           digraph += 'style="rounded"';
-          digraph += '\nstyle="filled"';
+          digraph += 'bgcolor="#EDF1F2"'
+          if(node._flagged =="PATTERN_PARENT"){digraph += 'color="#028d35"';}
           digraph += '\nid=' + node.id;
           digraph += "\n}";
           if(node.expandDependency)
@@ -572,13 +604,17 @@ module.exports = {
       _.each(dependencyEdges, function(edge) {
           digraph += edge;          
       });
-
+      
       if(showWeakDependency)
       {
         _.each(expansionPath._patternDetectedNodes,(nd)=>{
             if(nd._depBadDotString != "")
             {
               digraph +='{edge [id = ED' + nd.id + ', color="red",penwidth="0.5"]; ' + nd._depBadDotString + "}"
+            }
+            if(showAllDependencies && nd._depGoodDotString!="")
+            {
+              digraph +='{edge [id = ED' + nd.id + ', color="blue",penwidth="0.5"]; ' + nd._depGoodDotString + "}"
             }          
         })
 
@@ -622,6 +658,7 @@ module.exports = {
           engine: "dot",
           format: "svg"
         });
+        
         var end = new Date().getTime();
         console.log('Execution-Time of Layout-Calculation: ', end - start);
 
@@ -685,7 +722,7 @@ module.exports = {
         });
       }
       console.log('Resulting DOT-String size: ', sizeof.sizeof(digraph, true), digraph.length);
-
+      //svg =svg.substring(1,svg.indexOf('g id="3"')) + svg.substring(svg.indexOf('<p',svg.indexOf('g id="3"')),svg.indexOf('/>',svg.indexOf('<p',svg.indexOf('g id="3"')))) + '>' +'<animate attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>' + '</p>'
       return svg;
     }
 

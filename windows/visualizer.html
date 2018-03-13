@@ -111,14 +111,15 @@
  
               </tbody>
             </table>
+            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnResetAllNodes">Reset clicked Nodes</button>
             <button type="button" class="btn btn-primary btn-sm btn-block" id="btnShowAllNodes">Show all nodes in the graph</button>
             <div class="col-auto">
               <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="cbAllDependencies">
+                <input class="form-check-input" type="checkbox" id="cbAllDependencies" onclick='showAllDependencies(this)'>
                 <label class="form-check-label" for="cbAllDependencies">Show all dependencies</label>
               </div>
               <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="cbNegDependencies">
+                <input class="form-check-input" type="checkbox" id="cbNegDependencies" onclick='showWeakDependencies(this)'>
                 <label class="form-check-label" for="cbNegDependencies">Show negative dependencies</label>
               </div>
             </div>
