@@ -470,7 +470,7 @@ module.exports = {
        */
       function createNode(node,shape){
         let tempDiagraph = "";
-        if (node._flagged=="PATTERN_CHILDREN")
+        if (node._flagged=="PATTERN_CHILDREN" && node._evaluate)
         {
           tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#F5BDA2";fillcolor="#F5BDA2";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
         }
@@ -544,7 +544,7 @@ module.exports = {
                   }
                   functionNodes.push(functionCall);
                 });
-              }
+              } 
 
               // Add dependency-edges
               if (child.dependenciesVisible) {
@@ -610,11 +610,11 @@ module.exports = {
         _.each(expansionPath._patternDetectedNodes,(nd)=>{
             if(nd._depBadDotString != "")
             {
-              digraph +='{edge [id = ED' + nd.id + ', color="red",penwidth="0.5"]; ' + nd._depBadDotString + "}"
+              digraph +='{edge [id = ED' + nd.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + nd._depBadDotString + "}"
             }
             if(showAllDependencies && nd._depGoodDotString!="")
             {
-              digraph +='{edge [id = ED' + nd.id + ', color="blue",penwidth="0.5"]; ' + nd._depGoodDotString + "}"
+              digraph +='{edge [id = ED' + nd.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + nd._depGoodDotString + "}"
             }          
         })
 
@@ -626,11 +626,11 @@ module.exports = {
         //edge [id = 1123, color="red",penwidth="3.0"]; 2 -> c -> e -> a [weight=1]
         if(nodes[expandNodeDependency]._depGoodDotString != "")
         {
-          digraph += '{edge [id = ED' + expandNodeDependency + ', color="blue",penwidth="3.0"]; ' + nodes[expandNodeDependency]._depGoodDotString + "}"
+          digraph += '{edge [id = ED' + expandNodeDependency + ', color="blue",penwidth="3.0",style="dashed"]; ' + nodes[expandNodeDependency]._depGoodDotString + "}"
         }
         if(nodes[expandNodeDependency]._depBadDotString != "")
         {
-          digraph +='{edge [id = ED' + expandNodeDependency + ', color="red",penwidth="3.0"]; ' + nodes[expandNodeDependency]._depBadDotString + "}"
+          digraph +='{edge [id = ED' + expandNodeDependency + ', color="red",penwidth="3.0",style="dashed"]; ' + nodes[expandNodeDependency]._depBadDotString + "}"
         }
         // highlight the children with a blue shape border
         let highlightBorder = "{";

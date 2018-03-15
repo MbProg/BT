@@ -46,10 +46,10 @@ ipc.on('load-data', function (event, data) {
 ipc.on('update-graph', function (event, svg) {
 	$("#flow-graph-container").html(svg);
 	// first blink by animation the cluster
-	var path = document.getElementById('3').getElementsByTagName('path')[0]
-	path.setAttribute("id", "pathCluster3");
-	var newElement = '<animate id="myAnimation" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>'
-	path.insertAdjacentHTML( 'afterbegin', newElement );
+	// var path = document.getElementById('3').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "pathCluster3");
+	// var newElement = '<animate id="myAnimation" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>'
+	// path.insertAdjacentHTML( 'afterbegin', newElement );
 
 	// now move circle on the path 
 	var g8t3 = document.getElementById('8t4');
@@ -83,7 +83,7 @@ ipc.on('update-graph', function (event, svg) {
 	path.setAttribute("id", "path7t8");
 	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
-	document.getElementById("myAnimation").beginElement();
+	// document.getElementById("myAnimation").beginElement();
 	document.getElementById("myMoveAnimation8t4").beginElement();
 	document.getElementById("myMoveAnimation4t5").beginElement();
 	document.getElementById("myMoveAnimation5t6").beginElement();	
@@ -187,17 +187,17 @@ ipc.on('init-listeners', function (event) {
 		_.each(nodeData,function(node){
 			if ((option & 1) && node._pipelineScalarValue >=pipelineThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Pipeline</td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-road"></i></span>Pipeline</td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 2) && node._doAllScalarValue >=doAllThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Do All</td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-flash"></i></span>Do All</td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 4) && node._geometricDecomposition == 1)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;">Geometric Decomposition</td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-random"></i></span>Geometric Decomposition</td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
 				tablescripts.push(s);
 			}
 

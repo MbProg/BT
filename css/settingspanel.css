@@ -45,3 +45,7 @@
       #patternTable tr.header, #patternTable tr:hover {
       background-color: #f1f1f1;
       }
+
+      i.glyphicon {
+            margin-right: 5px;
+      }

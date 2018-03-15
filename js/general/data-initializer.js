@@ -50,25 +50,29 @@ module.exports = {
       var depBadPipelineDotString = "";
       var depGoodPipelineDotString = "";
       for (let m = 0; m < node.tempChildrenNodes.length; m++)
-      {
+      {   
         let badSet = new Set();
         let goodSet = new Set();
         let badPipelineSet = new Set();
         let goodPipelineSet = new Set();
         let child = node.tempChildrenNodes[m];
+        // just the dependencies of nodes flagged as evaluate should be shown, because they are relevant for computing parallel patterns
+        if(child.evaluate==0){continue;}     
         for (let n = 0; n < node.tempChildrenNodes.length; n++)
         {
           let otherChild = node.tempChildrenNodes[n];
+          // just the dependencies of nodes flagged as evaluate should be shown, because they are relevant for computing parallel patterns
+          if(otherChild.evaluate==0){continue;}     
           child.DependencyAll_RAW.forEach(dep =>{
               if (otherChild.id == dep.CUid)
               {
-                // for doAll
-                if (m>n)
-                  goodSet.add(dep.newID);
-                else
+                // for doAll: we have to detect the forward and self dependencies
+                if (m<=n)
                   badSet.add(dep.newID);
-                // for pipeline
-                if (n<m)
+                else
+                  goodSet.add(dep.newID);
+                // for pipeline: we have to detect the forward dependencies
+                if (m<n)
                   badPipelineSet.add(dep.newID);
                 else
                   goodPipelineSet.add(dep.newID);                  
@@ -98,22 +102,22 @@ module.exports = {
       
 
 
-      switch (node.type) {
+      switch (node.type) { 
         case 0:
-          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate));
           break;
         case 1:
-          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition);
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate);
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
-          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.startLine, node.endLine, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate));
           break;
         case 3:
-          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition));
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate));
           break;
         default: 
           console.error("Tried adding a node with a wrong type", node);

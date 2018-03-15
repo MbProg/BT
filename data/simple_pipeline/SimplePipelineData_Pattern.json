@@ -10,18 +10,21 @@
     "start": "1:21",
     "end": "1:22",
     "type": 1,
+    "evaluate": 1,
     "mwType": "ROOT",
     "GeometricDecomposition": 1,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
     "childrenNodes": [
       {
         "id": "1:1",
+        "evaluate": 1,
         "StartLine": "1:21",
         "EndLine": "1:21",
         "mwType": "FORK",
@@ -32,6 +35,7 @@
       },
       {
         "id": "1:2",
+        "evaluate": 1,
         "StartLine": "1:22",
         "EndLine": "1:22",
         "mwType": "FORK",
@@ -54,14 +58,18 @@
     "start": "1:21",
     "end": "1:21",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:2"
     ],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:21"
+    ],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
@@ -79,14 +87,20 @@
     "start": "1:47",
     "end": "1:49",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:12"
     ],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:47",
+      "1:48",
+      "1:49"
+    ],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [
       "1:48",
@@ -103,12 +117,13 @@
     "readDataSize": 0,
     "writeDataSize": 384,
     "pipelineScalarValue": 1,
-    "doAllScalarValue": 0.931,
+    "doAllScalarValue": 1,
     "start": "1:49",
     "end": "1:54",
     "type": 2,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [
       {
@@ -198,15 +213,17 @@
     ],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
     "childrenNodes": [
       {
         "id": "1:12",
+        "evaluate": 0,
         "StartLine": "1:49",
         "EndLine": "1:49",
-        "mwType": "WORKER",
+        "mwType": "FORK",
         "MergedIDs": [],
         "DependencyAll_RAW": [
           {
@@ -228,9 +245,10 @@
       },
       {
         "id": "1:13",
+        "evaluate": 1,
         "StartLine": "1:50",
         "EndLine": "1:50",
-        "mwType": "WORKER",
+        "mwType": "FORK",
         "MergedIDs": [
           "1:0",
           "1:1",
@@ -256,6 +274,7 @@
       },
       {
         "id": "1:14",
+        "evaluate": 1,
         "StartLine": "1:51",
         "EndLine": "1:51",
         "mwType": "WORKER",
@@ -284,6 +303,7 @@
       },
       {
         "id": "1:15",
+        "evaluate": 1,
         "StartLine": "1:52",
         "EndLine": "1:54",
         "mwType": "WORKER",
@@ -305,11 +325,19 @@
       },
       {
         "id": "1:19",
+        "evaluate": 0,
         "StartLine": "1:49",
         "EndLine": "1:49",
         "mwType": "FORK",
         "MergedIDs": [],
-        "DependencyAll_RAW": [],
+        "DependencyAll_RAW": [
+          {
+            "CUid": "1:19",
+            "sinkLine": "1:49",
+            "sourceLine": "1:49",
+            "varName": "i"
+          }
+        ],
         "DependencyAll_WAR": [],
         "DependencyAll_WAW": []
       }
@@ -327,8 +355,9 @@
     "start": "1:49",
     "end": "1:49",
     "type": 0,
+    "evaluate": 0,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:13",
       "1:20"
@@ -362,6 +391,9 @@
       }
     ],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:49"
+    ],
     "readPhaseLineNumbers": [
       "1:49"
     ],
@@ -381,8 +413,9 @@
     "start": "1:50",
     "end": "1:50",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:14"
     ],
@@ -422,6 +455,9 @@
         "varName": "a"
       }
     ],
+    "instructionsLineNumbers": [
+      "1:50"
+    ],
     "readPhaseLineNumbers": [
       "1:50"
     ],
@@ -437,9 +473,10 @@
     "childrenNodes": [
       {
         "id": "1:0",
+        "evaluate": 1,
         "StartLine": "1:21",
         "EndLine": "1:22",
-        "mwType": "FORK",
+        "mwType": "ROOT",
         "MergedIDs": [
           "1:1",
           "1:2"
@@ -462,8 +499,9 @@
     "start": "1:51",
     "end": "1:51",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:15"
     ],
@@ -497,6 +535,9 @@
         "varName": "b"
       }
     ],
+    "instructionsLineNumbers": [
+      "1:51"
+    ],
     "readPhaseLineNumbers": [
       "1:51"
     ],
@@ -512,6 +553,7 @@
     "childrenNodes": [
       {
         "id": "1:3",
+        "evaluate": 1,
         "StartLine": "1:25",
         "EndLine": "1:26",
         "mwType": "FORK",
@@ -537,8 +579,9 @@
     "start": "1:52",
     "end": "1:54",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:19"
     ],
@@ -565,6 +608,10 @@
         "varName": "c"
       }
     ],
+    "instructionsLineNumbers": [
+      "1:52",
+      "1:54"
+    ],
     "readPhaseLineNumbers": [
       "1:52"
     ],
@@ -580,6 +627,7 @@
     "childrenNodes": [
       {
         "id": "1:6",
+        "evaluate": 1,
         "StartLine": "1:29",
         "EndLine": "1:30",
         "mwType": "FORK",
@@ -605,8 +653,9 @@
     "start": "1:49",
     "end": "1:49",
     "type": 0,
+    "evaluate": 0,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:12"
     ],
@@ -633,6 +682,9 @@
       }
     ],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:49"
+    ],
     "readPhaseLineNumbers": [
       "1:49"
     ],
@@ -654,12 +706,16 @@
     "start": "1:22",
     "end": "1:22",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:22"
+    ],
     "readPhaseLineNumbers": [
       "1:22"
     ],
@@ -679,8 +735,9 @@
     "start": "1:55",
     "end": "1:56",
     "type": 0,
+    "evaluate": 0,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [
       {
@@ -699,6 +756,10 @@
       }
     ],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:55",
+      "1:56"
+    ],
     "readPhaseLineNumbers": [
       "1:55"
     ],
@@ -720,18 +781,21 @@
     "start": "1:25",
     "end": "1:26",
     "type": 1,
+    "evaluate": 1,
     "mwType": "ROOT",
     "GeometricDecomposition": 1,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
     "childrenNodes": [
       {
         "id": "1:4",
+        "evaluate": 1,
         "StartLine": "1:25",
         "EndLine": "1:25",
         "mwType": "FORK",
@@ -742,6 +806,7 @@
       },
       {
         "id": "1:5",
+        "evaluate": 1,
         "StartLine": "1:26",
         "EndLine": "1:26",
         "mwType": "FORK",
@@ -764,14 +829,18 @@
     "start": "1:25",
     "end": "1:25",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:5"
     ],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:25"
+    ],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
@@ -789,12 +858,16 @@
     "start": "1:26",
     "end": "1:26",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:26"
+    ],
     "readPhaseLineNumbers": [
       "1:26"
     ],
@@ -814,18 +887,21 @@
     "start": "1:29",
     "end": "1:30",
     "type": 1,
+    "evaluate": 1,
     "mwType": "ROOT",
     "GeometricDecomposition": 1,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
     "childrenNodes": [
       {
         "id": "1:7",
+        "evaluate": 1,
         "StartLine": "1:29",
         "EndLine": "1:29",
         "mwType": "FORK",
@@ -836,6 +912,7 @@
       },
       {
         "id": "1:8",
+        "evaluate": 1,
         "StartLine": "1:30",
         "EndLine": "1:30",
         "mwType": "FORK",
@@ -858,14 +935,18 @@
     "start": "1:29",
     "end": "1:29",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [
       "1:8"
     ],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:29"
+    ],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
@@ -883,12 +964,16 @@
     "start": "1:30",
     "end": "1:30",
     "type": 0,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [
+      "1:30"
+    ],
     "readPhaseLineNumbers": [
       "1:30"
     ],
@@ -908,8 +993,9 @@
     "start": "1:47",
     "end": "1:56",
     "type": 1,
+    "evaluate": 1,
     "mwType": "ROOT",
-    "GeometricDecomposition": 1,
+    "GeometricDecomposition": 0,
     "successorCUs": [],
     "RAWDepsOn": [
       {
@@ -1011,15 +1097,17 @@
     ],
     "WARDepsOn": [],
     "WAWDepsOn": [],
+    "instructionsLineNumbers": [],
     "readPhaseLineNumbers": [],
     "writePhaseLineNumbers": [],
     "functionCall": [],
     "childrenNodes": [
       {
         "id": "1:10",
+        "evaluate": 1,
         "StartLine": "1:47",
         "EndLine": "1:49",
-        "mwType": "FORK",
+        "mwType": "ROOT",
         "MergedIDs": [],
         "DependencyAll_RAW": [],
         "DependencyAll_WAR": [],
@@ -1027,9 +1115,10 @@
       },
       {
         "id": "1:11",
+        "evaluate": 1,
         "StartLine": "1:49",
         "EndLine": "1:54",
-        "mwType": "WORKER",
+        "mwType": "ROOT",
         "MergedIDs": [
           "1:12",
           "1:13",
@@ -1101,9 +1190,10 @@
       },
       {
         "id": "1:20",
+        "evaluate": 0,
         "StartLine": "1:55",
         "EndLine": "1:56",
-        "mwType": "FORK",
+        "mwType": "ROOT",
         "MergedIDs": [],
         "DependencyAll_RAW": [
           {
