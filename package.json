@@ -26,6 +26,7 @@
     "jstree": "3.3.1",
     "lodash": "4.13.1",
     "nconf": "0.8.4",
+    "pretty-checkbox": "^3.0.3",
     "sizeof": "1.0.0",
     "vis": "^4.21.0",
     "viz.js": "1.8.0"

@@ -55,40 +55,36 @@ ipc.on('update-graph', function (event, svg) {
 	var g8t3 = document.getElementById('8t4');
 	var path = document.getElementById('8t4').getElementsByTagName('path')[0]
 	path.setAttribute("id", "path8t4");
-	var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation8t4" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path8t4"></mpath></animateMotion></circle>'
+	var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation8t4" dur="3s"  begin="myMoveAnimation7t8.end"><mpath xlink:href="#path8t4"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 
 	// now move circle on the path 
 	var g8t3 = document.getElementById('4t5');
 	var path = document.getElementById('4t5').getElementsByTagName('path')[0]
 	path.setAttribute("id", "path4t5");
-	var circleAnim = ' <circle r="1.5" fill="green"><animateMotion id="myMoveAnimation4t5" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path4t5"></mpath></animateMotion></circle>'
+	var circleAnim = ' <circle r="1.5" fill="green"><animateMotion id="myMoveAnimation4t5" dur="3s"  begin="0s;myMoveAnimation8t4.end"><mpath xlink:href="#path4t5"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 
 	// now move circle on the path 
 	var g8t3 = document.getElementById('5t6');
 	var path = document.getElementById('5t6').getElementsByTagName('path')[0]
 	path.setAttribute("id", "path5t6");
-	var circleAnim = ' <circle r="1.2" fill="green"><animateMotion id="myMoveAnimation5t6" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path5t6"></mpath></animateMotion></circle>'
+	var circleAnim = ' <circle r="1.2" fill="green"><animateMotion id="myMoveAnimation5t6" dur="3s"  begin="myMoveAnimation4t5.end"><mpath xlink:href="#path5t6"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 	// now move circle on the path 
 	var g8t3 = document.getElementById('6t7');
 	var path = document.getElementById('6t7').getElementsByTagName('path')[0]
 	path.setAttribute("id", "path6t7");
-	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path6t7"></mpath></animateMotion></circle>'
+	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation6t7" dur="3s"  begin="myMoveAnimation5t6.end"><mpath xlink:href="#path6t7"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 	// now move circle on the path 
 	var g8t3 = document.getElementById('7t8');
 	var path = document.getElementById('7t8').getElementsByTagName('path')[0]
 	path.setAttribute("id", "path7t8");
-	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation" dur="5s" repeatCount="indefinite"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
+	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation7t8" dur="3s"  begin="myMoveAnimation6t7.end"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
 	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 	// document.getElementById("myAnimation").beginElement();
-	document.getElementById("myMoveAnimation8t4").beginElement();
 	document.getElementById("myMoveAnimation4t5").beginElement();
-	document.getElementById("myMoveAnimation5t6").beginElement();	
-	document.getElementById("myMoveAnimation6t7").beginElement();	
-	document.getElementById("myMoveAnimation7t8").beginElement();	
 	
 	// $("#3").find("path").append('<animate id="animateCluster" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="indefinite"></animate>');
 	// $("#animateCluster").beginElement();
@@ -365,7 +361,23 @@ ipc.on('init-listeners', function (event) {
 			hasVariables: !node.type
 		};
 		var nodeDataTable = template(nodeInfoData);
+		//<p class="noMargin">Node: 1:9 &nbsp;&nbsp;&nbsp;&nbsp; Type: Function &nbsp;&nbsp;&nbsp;&nbsp; Read: 32B &nbsp;&nbsp;&nbsp;&nbsp; Write: 64B &nbsp;&nbsp;&nbsp;&nbsp; </p>
 
+		// Update the tdlblNode:
+		$("#lblCaption").html('<p class="noMargin">&nbsp;&nbsp;&nbsp;&nbsp;Node: '+data.originalID +   ' &nbsp;&nbsp;&nbsp;&nbsp; Type: ' + data.type + ' &nbsp;&nbsp;&nbsp;&nbsp; Read: ' + node.readDataSize + 'B &nbsp;&nbsp;&nbsp;&nbsp; Write: ' + node.writeDataSize+ 'B &nbsp;&nbsp;&nbsp;&nbsp; </p>')
+		$("#lblPipeline").html('Pipeline:' + node._pipelineScalarValue );
+		$("#lblDoAll").html('Do-All:' + node._doAllScalarValue );
+		$("#lblGeoDecomp").html('Geometric Decomposition:' + node._geometricDecomposition);
+		var worker = '';
+		var barrier = '';
+		_.each(node._childrenDetails,function(node){
+			if(node.mwType == 'WORKER'){
+				worker += node.id + ';'
+			}else if(node.mwType == 'BARRIER'){
+				barrier += node.id + ';'
+			}
+		});
+		$("#lblTaskParallelism").html('Task Parallelism: Worker:[' + worker.substring(0,worker.length-1) + '] - Barrier:[' + barrier.substring(0,barrier.length-1) + ']')
 		$("#node-info-container").html(nodeDataTable);
 		$('#code-container-tab').trigger('click');
 	});

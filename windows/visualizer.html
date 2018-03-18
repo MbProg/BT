@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css">
+  <link rel="stylesheet" href="../node_modules/pretty-checkbox\dist\pretty-checkbox.min.css">
 
   <link rel="stylesheet" href="../css/index.css">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -191,15 +192,12 @@
 
   <table id="visualizer-table" border="1">
     <tr>
-      <td>
-
-      </td>
-      <td>
-        <table style="width: 100%; height: 100%;" border="1">
+      <td id="tdVisualizer">
+        <table style="width: 100%; height: 100%;" border="0">
           <tr>
             <td>
               <div class="container" id="graph-container">
-                <button class="btn btn-primary pull-right btn-sm" type="button" id="show-legend-button">
+                <!-- <button class="btn btn-primary pull-right btn-sm" type="button" id="show-legend-button">
                   Legend
                 </button>
                 <button class="btn btn-primary pull-right btn-sm" type="button" id="node-info-button">
@@ -216,7 +214,7 @@
                     <span class="badDependency"></span>negative dependency</li>
                   <li>
                     <span class="dataflowDependency"></span>Data flow</li>
-                </ul>
+                </ul> -->
                 <div class="tab-content">
                   <div id="flow-graph-container" class="tab-pane fade in active">
                     <svg></svg>
@@ -428,6 +426,38 @@
             </td>
           </tr>
         </table>
+      </td>
+    </tr>
+    <tr>
+      <td id="tdlblNode" style="height:20px;">
+        <div id="lblCaption" class="pretty p-default p-thick p-pulse">
+            <p class="noMargin">Node: 1:9 &nbsp;&nbsp;&nbsp;&nbsp; Type: Function &nbsp;&nbsp;&nbsp;&nbsp; Read: 32B &nbsp;&nbsp;&nbsp;&nbsp; Write: 64B &nbsp;&nbsp;&nbsp;&nbsp; </p>
+          </div>
+        <div class="pretty p-default p-thick p-pulse">
+            <input type="checkbox" />
+            <div class="state p-info-o">
+                <label id="lblPipeline">Pipeline</label>
+            </div>
+        </div>
+        <div class="pretty p-default p-thick p-pulse">
+            <input type="checkbox" />
+            <div class="state p-info-o">
+                <label id="lblDoAll">Do-All</label>
+            </div>
+        </div>
+        <div class="pretty p-default p-thick p-pulse">
+            <input type="checkbox" />
+            <div class="state p-info-o">
+                <label id="lblGeoDecomp">Geometric Decomposition</label>
+            </div>
+        </div>
+        <div class="pretty p-default p-thick p-pulse">
+            <input type="checkbox" />
+            <div class="state p-info-o">
+                <label id="lblTaskParallelism">Task Parallelism</label>
+            </div>
+        </div>
+
       </td>
     </tr>
   </table>
