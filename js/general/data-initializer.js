@@ -47,12 +47,16 @@ module.exports = {
       var depGoodDotString = "";
       var depBadPipelineDotString = "";
       var depGoodPipelineDotString = "";
+      var depBadTPDotString = "";
+      var depGoodTPDotString = "";
       for (let m = 0; m < node.tempChildrenNodes.length; m++)
       {   
         let badSet = new Set();
         let goodSet = new Set();
         let badPipelineSet = new Set();
         let goodPipelineSet = new Set();
+        let badTaskParallelismSet = new Set();
+        let goodTaskParallelismSet = new Set();
         let child = node.tempChildrenNodes[m];
         // just the dependencies of nodes flagged as evaluate should be shown, because they are relevant for computing parallel patterns
         if(child.evaluate==0){continue;}     
@@ -73,7 +77,12 @@ module.exports = {
                 if (m<n)
                   badPipelineSet.add(dep.newID);
                 else
-                  goodPipelineSet.add(dep.newID);                  
+                  goodPipelineSet.add(dep.newID);   
+                  
+                if(child.mwType.includes('BARRIER') && otherChild.mwType.includes('BARRIER'))
+                  badTaskParallelismSet.add(dep.newID);
+                else
+                  goodTaskParallelismSet.add(dep.newID);
               }
           })
   
@@ -90,6 +99,12 @@ module.exports = {
         goodPipelineSet.forEach(depNode =>{
           depGoodPipelineDotString +=  child.newID + "->" + depNode + " ";
         })
+        badTaskParallelismSet.forEach(depNode => {
+          depBadTPDotString += child.newID + "->" + depNode + " ";
+        })
+        goodTaskParallelismSet.forEach(depNode =>{
+          depGoodTPDotString += child.newID + "->" + depNode + " ";
+        })
         
       }
  
@@ -97,25 +112,26 @@ module.exports = {
       node.depBadDotString = depBadDotString;
       node.depGoodPipelineDotString = depGoodPipelineDotString;
       node.depBadPipelineDotString = depBadPipelineDotString;
-      
+      node.depGoodTPDotString = depGoodTPDotString;
+      node.depBadTPDotString = depBadTPDotString;
 
 
       switch (node.type) { 
         case 0:
-          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.tempChildrenNodes, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate));
+          nodes.push(new CuNode(i, node.originalId,  node.fileId, node.lines, node.depGoodDotString, node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.depGoodTPDotString,node.depBadTPDotString, node.tempChildrenNodes, node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.taskParallelism, node.evaluate));
           break;
         case 1:
-          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,  node.tempChildrenNodes, node.startLine, node.endLine,node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate);
+          classNode = new FunctionNode(i,node.originalId,  node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.depGoodTPDotString,node.depBadTPDotString,  node.tempChildrenNodes, node.startLine, node.endLine,node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.name, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.taskParallelism, node.evaluate);
           for (j = 0; j < node.functionArguments.length; j++) {
             classNode.addArgument(new NodeVariable(node.functionArguments[j].name, node.functionArguments[j].type));
           }
           nodes.push(classNode);
           break;
         case 2:
-          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.tempChildrenNodes, node.startLine, node.endLine,node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.evaluate));
+          nodes.push(new LoopNode(i,node.originalId, node.fileId, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString, node.depGoodTPDotString,node.depBadTPDotString, node.tempChildrenNodes, node.startLine, node.endLine,node.readDataSize, node.writeDataSize, node.readPhaseLineNumbers, node.writePhaseLineNumbers, node.heatFactor, node.loopLevel, node.descendantNodeCount,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.taskParallelism,node.evaluate));
           break;
         case 3:
-          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition, node.mwType,node.evaluate));
+          nodes.push(new LibraryFunctionNode(i, node.originalId, node.fileId, node.name, node.depGoodDotString,  node.depBadDotString, node.depGoodPipelineDotString, depBadPipelineDotString,  node.depGoodTPDotString,node.depBadTPDotString, node.pipelineScalarValue, node.doAllScalarValue,node.GeometricDecomposition,node.taskParallelism, node.mwType,node.evaluate));
           break;
         default: 
           console.error("Tried adding a node with a wrong type", node);

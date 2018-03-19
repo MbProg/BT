@@ -18,7 +18,7 @@ class Node {
    * @param   {number[]}    writeLines      The lines on which a write occurs within the CU
    * @param   {number}      heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, type, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate) {
+  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, type, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate) {
     this._id = id;
     this._originalId = originalId;
     this._fileId = fileId;
@@ -40,9 +40,12 @@ class Node {
     this._depBadDotString = depBadDotString
     this._depGoodPipelineDotString = depGoodPipelineDotString;
     this._depBadPipelineDotString = depBadPipelineDotString;
+    this._depGoodTPDotString = depGoodTPDotString;
+    this._depBadTPDotString = depBadTPDotString;
     this._pipelineScalarValue = pipelineScalarValue;
     this._doAllScalarValue = doAllScalarValue;
     this._geometricDecomposition = geometricDecomposition;
+    this._taskParallelism = taskParallelism;
     this._flagged = "NULL";
     this._evaluate = evaluate;
   }
@@ -233,7 +236,7 @@ class CuNode extends Node {
    * @param  {!number[]}        writeLines      The lines on which a write occurs within the CU
    * @param  {number}           heatFactor      The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, lines, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, childrenDetails, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate) {
+  constructor(id, originalId, fileId, lines, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, childrenDetails, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism, evaluate) {
       var start = lines[0];
       var end = lines[0];
       var temp = [];
@@ -246,7 +249,7 @@ class CuNode extends Node {
     	  }
     	  temp[i] = lines[i];
       }
-	  super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 0, childrenDetails, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue ,geometricDecomposition,evaluate);
+	  super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, 0, childrenDetails, start, end, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue ,geometricDecomposition,taskParallelism,evaluate);
       this._localVariables = [];
       this._globalVariables = [];
       this._dependencies = [];
@@ -392,8 +395,8 @@ class LoopNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString,depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate) {
-    super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 2, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate);
+  constructor(id, originalId, fileId, depGoodDotString,depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, level, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate) {
+    super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, 2, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate);
     this._level = level;
     this._descendantNodeCount = descendantNodeCount;
   }
@@ -427,8 +430,8 @@ class LibraryFunctionNode extends Node {
    * @param  {!number} fileId  The id of the file it refers to
    * @param  {!string} name    The name of the function
    */
-  constructor(id, originalId, fileId, name,depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString,pipelineScalarValue,doAllScalarValue,geometricDecomposition,childrenDetails,evaluate) {
-    super(id,originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 3,childrenDetails,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate);
+  constructor(id, originalId, fileId, name,depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,childrenDetails,evaluate) {
+    super(id,originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, 3,childrenDetails,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate);
     this._name = name;
   }
 
@@ -460,8 +463,8 @@ class FunctionNode extends Node {
    * @param  {!number}          descendantNodeCount   The amount of nodes that are descendants of this one
    * @param  {number}           heatFactor            The factor of heat of this node in relation to other nodes in the graph
    */
-  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate) {
-    super(id, originalId, fileId,  depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, 1, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,evaluate);
+  constructor(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor, name, descendantNodeCount,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate) {
+    super(id, originalId, fileId,  depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, 1, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate);
     this._name = name;
     this._arguments = [];
     this._descendantNodeCount = descendantNodeCount;

@@ -267,6 +267,7 @@ ipc.on('init-listeners', function (event) {
 		}
 	});
 
+	$('#cbParallelism').on('')
 	/**
 	 * Graph click behavior
 	 */
@@ -658,3 +659,13 @@ function chbPipelineClicked(cb) {
 	alert('Hello')
 }
 
+function cbPipelineClicked(cb){
+	$('#cbPipeline').prop('checked', cb.checked);
+	$('#cbDoAll').prop('checked',false);
+	$('#cbGeoDecomp').prop('checked',false);
+	$('#cbTaskParallelism').prop('checked',false);
+	if(cb.checked){
+	var nodeId = $('#lblCaption').html().substring($('#lblCaption').html().indexOf('Node: ')+6,$('#lblCaption').html().indexOf('&nbsp',$('#lblCaption').html().indexOf('Node: '))).trim();
+	ipc.send('showANode',nodeId);
+	}
+}

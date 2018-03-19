@@ -474,6 +474,9 @@ module.exports = {
         {
           tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#F5BDA2";fillcolor="#F5BDA2";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
         }
+        else if(node._pipelineScalarValue > g_pipelineThreshold || node._doAllScalarValue > g_doAllThreshold || node._geometricDecomposition == 1 ){//
+          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#bbc6dd";fillcolor="#bbc6dd";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
+        }
         else
         {
           tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#A4A4A4";fillcolor="white";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
@@ -525,9 +528,9 @@ module.exports = {
               });
 
               // Add edges to called function-nodes to the queue to be added
-				// to the digraph at the end
+              // to the digraph at the end
               // (adding them at the end, renders the called-function outside
-				// of this function)
+              // of this function)
               if (child.expanded) {
                 _.each(child.children, function(functionCall) {
                   if (functionCall.type == 1) {
@@ -540,7 +543,7 @@ module.exports = {
                     }
                   } else {
                     edge = child.id + ' -> ' + functionCall.id;
-                    digraph += '\n' + edge + ' [style=dotted, id="' + edge.replace(' -> ', 't') + '",color="#717070",arrowsize=.5];';
+                    digraph += '\n' + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="#717070",arrowsize=.5];';
                   }
                   functionNodes.push(functionCall);
                 });

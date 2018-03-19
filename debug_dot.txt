@@ -40,22 +40,18 @@ label=<<TABLE BORDER="0">
 </TABLE>>;style="rounded"bgcolor="#EDF1F2"
 id=17
 }
-subgraph cluster11 {
-12 [id=12, shape=Mrecord;color="#A4A4A4";fillcolor="white";label=<<TABLE BORDER="0">
-<TR><TD>1:4</TD></TR>
+subgraph cluster0 {
+1 [id=1, shape=Mrecord;color="#A4A4A4";fillcolor="white";label=<<TABLE BORDER="0">
+<TR><TD>1:1</TD></TR>
 </TABLE>>, style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];
-12 -> 13 [id="12t13",color="#717070",arrowsize=.5];
-13 [id=13, shape=Mrecord;color="#A4A4A4";fillcolor="white";label=<<TABLE BORDER="0">
-<TR><TD>1:5</TD></TR>
+1 -> 9 [id="1t9",color="#717070",arrowsize=.5];
+9 [id=9, shape=Mrecord;color="#A4A4A4";fillcolor="white";label=<<TABLE BORDER="0">
+<TR><TD>1:2</TD></TR>
 </TABLE>>, style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];
 label=<<TABLE BORDER="0">
-<TR><TD>1:3</TD></TR>
-</TABLE>>;style="rounded"bgcolor="#EDF1F2"
-id=11
-}
-0 [id=0, shape=hexagon;color="#A4A4A4";fillcolor="white";label=<<TABLE BORDER="0">
 <TR><TD>1:0</TD></TR>
-</TABLE>>, style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];
-5 -> 0 [style=dotted, id="5t0"];
-6 -> 12 [style=dotted, id="6t12"];
+</TABLE>>;style="rounded"bgcolor="#EDF1F2"
+id=0
+}
+5 -> 1 [style=dotted, id="5t1"];
 }
