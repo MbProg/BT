@@ -1,5 +1,6 @@
 'use strict'
 
+const CONSTANTS = require('./constants');
 var classes = require('../classes/discopop-classes');
 var IntervalTree = require('../classes/intervalTree');
 var CuNode = classes.CuNode;
@@ -79,7 +80,7 @@ module.exports = {
                 else
                   goodPipelineSet.add(dep.newID);   
                   
-                if(child.mwType.includes('BARRIER') && otherChild.mwType.includes('BARRIER'))
+                if(child.mwType.includes(CONSTANTS.BARRIER) && otherChild.mwType.includes(CONSTANTS.BARRIER))
                   badTaskParallelismSet.add(dep.newID);
                 else
                   goodTaskParallelismSet.add(dep.newID);

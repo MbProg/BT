@@ -2,6 +2,8 @@ const ipc = require("electron").ipcRenderer;
 var _ = require('lodash/core');
 var d3 = require('d3');
 var $ = global.jQuery = window.$ = require('jquery');
+const CONSTANTS = require('../js/general/constants');
+
 // Hack to fix outdated libraries accessing outdated ui property
 window.$.ui = require('jquery-ui');
 
@@ -183,17 +185,22 @@ ipc.on('init-listeners', function (event) {
 		_.each(nodeData,function(node){
 			if ((option & 1) && node._pipelineScalarValue >=pipelineThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-road"></i></span>Pipeline</td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-road"></i></span><span class="Pattern">' + CONSTANTS.PIPELINE + '</span></td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 2) && node._doAllScalarValue >=doAllThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-flash"></i></span>Do All</td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-flash"></i></span><span class="Pattern">' + CONSTANTS.DOALL + '</span></td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
-			if ((option & 4) && node._geometricDecomposition == 1)
+			if ((option & 4) && node._taskParallelism == 1)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-random"></i></span>Geometric Decomposition</td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-hd-video"></i></span><span class="Pattern">' + CONSTANTS.TASKPARALLELISM + '</span></td><td style="width:10%;">' + node._taskParallelism + '</td></tr>'
+				tablescripts.push(s);
+			}
+			if ((option & 8) && node._geometricDecomposition == 1)
+			{
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-random"></i></span><span class="Pattern">' + CONSTANTS.GEOMETRICDECOMPOSITION + '</span></td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
 				tablescripts.push(s);
 			}
 
@@ -208,8 +215,9 @@ ipc.on('init-listeners', function (event) {
 			return;
 		}
 		else{
-			if(option != 4){option = 1 <<(option-1);}
-			else{option = 7;}
+			// every pattern search option gets a bit, if all bits are set then we have a search for all pattern
+			if(option != 5){option = 1 <<(option-1);}
+			else{option = 15;}
 			
 			$("#patternTable tbody tr").remove();
 			var scripts = getNodes(option);
@@ -231,14 +239,17 @@ ipc.on('init-listeners', function (event) {
 	$("#btnShowAllNodes").on("click", function(){
 		var tds = document.querySelectorAll('#patternTable tbody tr'), i;
 		var nodeIds = [];
+		var nodePatterns = [];
 		if(!tds.length){return;}			
 		for(i = 0; i < tds.length; ++i) {
 			// do something here
 			tds[i].style.background = "#F3ECEC"
 			var cells = tds[i].getElementsByTagName("td");
 			nodeIds.push(cells[0].innerHTML);
+			nodePatterns.push(cells[1].textContent);
+
 		}
-		ipc.send('showAllNodes',nodeIds);
+		ipc.send('showAllNodes',nodeIds,nodePatterns);
 
 	});
 
@@ -248,12 +259,12 @@ ipc.on('init-listeners', function (event) {
 		var target = e.srcElement || e.target;
 		while (target && target.nodeName !== "TR") {
 			target = target.parentNode;
-			target.style.background = "#F3ECEC";
 		}
+		target.style.background = "#F3ECEC";
 		if (target) {
 			var cells = target.getElementsByTagName("td");
 			data.push(cells[0].innerHTML);
-			ipc.send('showANode',cells[0].innerHTML);
+			ipc.send('showANode',cells[0].innerHTML,cells[1].textContent);
 
 		}
 	})
@@ -273,9 +284,24 @@ ipc.on('init-listeners', function (event) {
 	 */
 	var graphContainer = $("#graph-container");
 
+	var clicktimer;
 	// Node selection
 	graphContainer.delegate('g.node, g.cluster', 'click', function (e) {
 		e.stopImmediatePropagation();
+		if(clicktimer){
+			clearTimeout(clicktimer);
+			clicktimer= null;
+			return;
+		}
+		else
+		{ 
+			clicktimer= setTimeout(function(e){
+			clicktimer= null;
+			/* single click code*/
+			},500)
+		};
+
+		
 		var node = nodeData[this.id];
 
 		// Highlight/Unhighlight in the code editor(left) and  in the graph(right)
@@ -362,23 +388,54 @@ ipc.on('init-listeners', function (event) {
 			hasVariables: !node.type
 		};
 		var nodeDataTable = template(nodeInfoData);
-		//<p class="noMargin">Node: 1:9 &nbsp;&nbsp;&nbsp;&nbsp; Type: Function &nbsp;&nbsp;&nbsp;&nbsp; Read: 32B &nbsp;&nbsp;&nbsp;&nbsp; Write: 64B &nbsp;&nbsp;&nbsp;&nbsp; </p>
 
 		// Update the tdlblNode:
-		$("#lblCaption").html('<p class="noMargin">&nbsp;&nbsp;&nbsp;&nbsp;Node: '+data.originalID +   ' &nbsp;&nbsp;&nbsp;&nbsp; Type: ' + data.type + ' &nbsp;&nbsp;&nbsp;&nbsp; Read: ' + node.readDataSize + 'B &nbsp;&nbsp;&nbsp;&nbsp; Write: ' + node.writeDataSize+ 'B &nbsp;&nbsp;&nbsp;&nbsp; </p>')
-		$("#lblPipeline").html('Pipeline:' + node._pipelineScalarValue );
-		$("#lblDoAll").html('Do-All:' + node._doAllScalarValue );
-		$("#lblGeoDecomp").html('Geometric Decomposition:' + node._geometricDecomposition);
-		var worker = '';
-		var barrier = '';
-		_.each(node._childrenDetails,function(node){
-			if(node.mwType == 'WORKER'){
-				worker += node.id + ';'
-			}else if(node.mwType == 'BARRIER'){
-				barrier += node.id + ';'
-			}
-		});
-		$("#lblTaskParallelism").html('Task Parallelism: Worker:[' + worker.substring(0,worker.length-1) + '] - Barrier:[' + barrier.substring(0,barrier.length-1) + ']')
+		if ($("#lblCaption").html()=='<p class="noMargin">&nbsp;&nbsp;&nbsp;&nbsp;Node: '+data.originalID +   ' &nbsp;&nbsp;&nbsp;&nbsp; Type: ' + data.type + ' &nbsp;&nbsp;&nbsp;&nbsp; Read: ' + node.readDataSize + 'B &nbsp;&nbsp;&nbsp;&nbsp; Write: ' + node.writeDataSize+ 'B &nbsp;&nbsp;&nbsp;&nbsp; </p>')
+		{
+			// because dblclick calls twice the click event, we want to prevent to run the animation on lblCaption...
+		}else{
+			// write the selected node with its pattern values in the NodeCaptionContainer elements
+			$("#lblCaption").html('<p class="noMargin">&nbsp;&nbsp;&nbsp;&nbsp;Node: '+data.originalID +   ' &nbsp;&nbsp;&nbsp;&nbsp; Type: ' + data.type + ' &nbsp;&nbsp;&nbsp;&nbsp; Read: ' + node.readDataSize + 'B &nbsp;&nbsp;&nbsp;&nbsp; Write: ' + node.writeDataSize+ 'B &nbsp;&nbsp;&nbsp;&nbsp; </p>')
+			$("#lblPipeline").html('Pipeline:' + node._pipelineScalarValue );
+			$("#lblDoAll").html('Do-All:' + node._doAllScalarValue );
+			$("#lblGeoDecomp").html('Geometric Decomposition:' + node._geometricDecomposition);
+			var fork = '';
+			var worker = '';
+			var conBarrier = '';
+			var nonconBarrier = '';
+			_.each(node._childrenDetails,function(node){
+				if(node.evaluate){
+					if(node.mwType == CONSTANTS.WORKER){
+						worker += node.id + ';'
+					}else if(node.mwType == CONSTANTS.CON_BARRIER){
+						conBarrier += node.id + ';'
+					}else if(node.mwType == CONSTANTS.NONCON_BARRIER){
+						nonconBarrier += node.id + ";"
+					}
+					else if(node.mwType == CONSTANTS.FORK){
+						fork += node.id + ';'
+					}
+				}
+			});
+			// first reset the radio buttons 
+			$('#rbPipeline').attr("checked",false)
+			$('#rbDoAll').attr("checked",false)
+			$('#rbGeoDecomp').attr("checked",false) 
+			$('#rbTaskParallelism').attr("checked",false)			
+
+			// enable and disable radio buttons
+			$('#rbPipeline').attr("disabled",(node._pipelineScalarValue < configuration.readSetting('pipelineThreshold')))
+			$('#rbDoAll').attr("disabled",(node._doAllScalarValue < configuration.readSetting('doAllThreshold')))
+			$('#rbGeoDecomp').attr("disabled",(node._geometricDecomposition == 0)) 
+			$('#rbTaskParallelism').attr("disabled",(node._taskParallelism == 0))			
+
+			$("#lblTaskParallelism").html('Task Parallelism: Fork:[' + fork.substring(0,fork.length-1) + '] - Worker:[' + worker.substring(0,worker.length-1) + '] - Conc. Barrier:[' + conBarrier.substring(0,conBarrier.length-1) + '] - Nonconc. Barrier:[' + nonconBarrier.substring(0,nonconBarrier.length-1) + ']')
+			// rerun the animation
+			var el = document.getElementById('NodeCaptionContainer');
+			el.style.animation = 'none';
+			el.offsetHeight; /* trigger reflow */
+			el.style.animation = null; 
+		}
 		$("#node-info-container").html(nodeDataTable);
 		$('#code-container-tab').trigger('click');
 	});
@@ -651,21 +708,33 @@ function showAllDependencies(cb){
 	$('#cbNegDependencies').prop('checked', cb.checked);
 	ipc.send('showAllDependencies',cb.checked)
 }
-function showPipelines(cb){
-	ipc.send('showParallelPatterns');
+
+function getlblNodeId(){
+	return $('#lblCaption').html().substring($('#lblCaption').html().indexOf('Node: ')+6,$('#lblCaption').html().indexOf('&nbsp',$('#lblCaption').html().indexOf('Node: '))).trim();
 }
 
-function chbPipelineClicked(cb) {
-	alert('Hello')
-}
+function rbPipelineClicked(cb){
 
-function cbPipelineClicked(cb){
-	$('#cbPipeline').prop('checked', cb.checked);
-	$('#cbDoAll').prop('checked',false);
-	$('#cbGeoDecomp').prop('checked',false);
-	$('#cbTaskParallelism').prop('checked',false);
 	if(cb.checked){
-	var nodeId = $('#lblCaption').html().substring($('#lblCaption').html().indexOf('Node: ')+6,$('#lblCaption').html().indexOf('&nbsp',$('#lblCaption').html().indexOf('Node: '))).trim();
-	ipc.send('showANode',nodeId);
+		ipc.send('showANode',getlblNodeId(),CONSTANTS.PIPELINE);
 	}
 }
+
+function rbDoAllClicked(rb){
+	if(rb.checked){
+		ipc.send('showANode',getlblNodeId(),CONSTANTS.DOALL);
+	}
+}
+
+function rbGeoDecompClicked(rb){
+	if(rb.checked){
+		ipc.send('showANode',getlblNodeId(),CONSTANTS.GEOMETRICDECOMPOSITION);
+	}	
+}
+
+function rbTaskParallelismClicked(rb){
+	if(rb.checked){
+		ipc.send('showANode',getlblNodeId(),CONSTANTS.TASKPARALLELISM);
+	}	
+}
+

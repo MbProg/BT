@@ -1,3 +1,4 @@
+
 'use strict'
 
 var _ = require('lodash');
@@ -9,6 +10,7 @@ var fs = require('fs');
 var Viz = require('../../node_modules/viz.js/viz.js');
 var g_pipelineThreshold = 0.0
 var g_doAllThreshold = 0.0
+const CONSTANTS = require('../general/constants');
 /**
  * Class for keeping track of the node-expansions done by the user.
  */
@@ -20,110 +22,63 @@ class ExpansionPath {
     this._patternDetectedNodes = [];
     this._rootNodes = rootNodes;
   }
-  expandToNodes(nodeIds){
+  expandToNodes(nodeIds,nodePatterns,reserve){
+    reserve = reserve || false;
     // use DFS to expand all nodes which are in the path to a node with pipeline    
     _.each(this._rootNodes,(root)=>{
-      this.expandToNodesSub(root,nodeIds);
+      this.expandToNodesSub(root,nodeIds,nodePatterns,reserve);
     })
   }
-  expandToNodesSub(node,nodeIds)
+  expandToNodesSub(node,nodeIds,nodePatterns,reserve)
   {
+    // first we expand the nodes and add them to the ExpansionPath, because we are going bottom up
+    // if the node is not detected then we close them and remove them from ExpansionPath until we have reachted the root
     this.addNode(node);
     node.expand();
-    let nodefound = false
+    let childNodeIdMatched = false
+    var temp = node._childrenDetails;
     _.each(node.children,(child)=>{
-      nodefound |= this.expandToNodesSub(child,nodeIds);
+      childNodeIdMatched |= this.expandToNodesSub(child,nodeIds,nodePatterns,reserve);
     })
-    let found = nodeIds.indexOf( node.originalId)
-    if (nodefound || found >=0)
+    let NodeIdMatched = nodeIds.indexOf( node.originalId)
+    // if one of the children or this node is the goal -> don't remove them from ExpansionPath
+    if (childNodeIdMatched || NodeIdMatched >=0 || (reserve && node._gui_shownPattern != ""))
     {
-      if (found >=0)
-      {
-        node.setFlag("PATTERN_PARENT")
-        this._patternDetectedNodes.push(node);
-        _.each(node.children,(child)=>{
-          child.setFlag("PATTERN_CHILDREN");
-        })
-      }
-    }
-    else
-    {
-      this.removeNode(node);
-      node.collapse()
-    }
-    return node.expanded;
-  }
-  expandToANode(nodeId)
-  {
-    // use DFS to expand all nodes which are in the path to a node with pipeline    
-    _.each(this._rootNodes,(root)=>{
-      this.expandToANodeSub(root,nodeId);
-    })
-  }
-  expandToANodeSub(node,nodeId)
-  {
-    this.addNode(node);
-    node.expand();
-    let nodefound = false
-    _.each(node.children,(child)=>{
-      nodefound |= this.expandToANodeSub(child,nodeId);
-    })
-    // either one of the children of this node has been founded (nodefound) or this node is the target or this node was marked before as CHILDREN
-    // if marked before as PATTERN_CHILDREN, we have to collapse it but keep it flagged
-    // if this is the target node, mark its children as PATTERN_CHILDREN and itself as PATTERN_PARENT
-    if (nodefound || node.originalId == nodeId || (node._flagged == "PATTERN_CHILDREN"))
-    {
-      if (node.originalId == nodeId)
-      {
-        node.setFlag("PATTERN_PARENT")
-        this._patternDetectedNodes.push(node);
-        _.each(node.children,(child)=>{
-          child.setFlag("PATTERN_CHILDREN");
-        })
-      }
-      if (node._flagged == "PATTERN_CHILDREN" && !nodefound){
-        // children must be collapsed which don't have a found child node should be collapsed
-        node.collapse();
-      }
-    }
-    // if this node does not fullfill any of the conditions we have to collapse it and remove it from opened node and deflag it
-    else
-    {
-      this.removeNode(node);
-      node.collapse();
-      node.setFlag("NULL");
-    }
-    return node.expanded||nodefound || node.originalId == nodeId || (node._flagged == "PATTERN_CHILDREN");
-  }
+      // if this node is the goal -> set red border, pattern of the node and the right border- and fillcolor for the children
+      if (NodeIdMatched >=0)
+      {        
+        node._gui_shownPattern = nodePatterns[NodeIdMatched]; // the pattern selected for the node
+        node._gui_borderColor = CONSTANTS.PATTERNBORDERCOLOR; // red border
+        this._patternDetectedNodes.push(node);                // we need that to reference all found pattern nodes
 
-  expandPipelineNodes()
-  {
-    // use DFS to expand all nodes which are in the path to a node with pipeline
-    
-    _.each(this._rootNodes,(root)=>{
-      this.expandPipelineNode(root);
-    })
-    
-  }
-  expandPipelineNode(node)
-  {
-    this.addNode(node);
-    node.expand();
-    let bPipeline = false
-    _.each(node.children,(child)=>{
-      bPipeline |= this.expandPipelineNode(child);
-    })
-    if (bPipeline || node._pipelineScalarValue > g_pipelineThreshold)
-    {
-      if (node._pipelineScalarValue > g_pipelineThreshold)
-      {
-        node.setFlag("PATTERN_PARENT")
-        this._patternDetectedNodes.push(node);
+        // set the gui attributes of the children
         _.each(node.children,(child)=>{
-          child.setFlag("PATTERN_CHILDREN");
+          if (child._evaluate){
+            // color is changed if the pattern is taskparallelism
+            if(node._gui_shownPattern == CONSTANTS.TASKPARALLELISM){
+              _.filter(node._childrenDetails,(childDetails)=>{
+                if (childDetails.id == child._originalId){
+                  switch(childDetails.mwType){
+                    case CONSTANTS.FORK:child._gui_fillcolor = CONSTANTS.FORKFILLCOLOR; break;
+                    case CONSTANTS.WORKER:child._gui_fillcolor = CONSTANTS.WORKERFILLCOLOR; break;
+                    case CONSTANTS.BARRIER:child._gui_fillcolor = CONSTANTS.BARRIERFILLCOLOR; break;
+                    default: child._gui_fillcolor = CONSTANTS.BARRIERNONCONCOLOR; child._gui_borderColor = CONSTANTS.NORMALBORDERCOLOR; break;
+                  }
+                  child._gui_borderColor = child.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.EVALUATEDNODEBORDERCOLOR;
+                  return;
+                }
+              });
+            }
+            // for all other evaluated childnodes of other patterns just the redorange fill color and red border if they contain patterns
+            else{
+              child._gui_fillcolor = CONSTANTS.EVALUATIONFILLCOLOR;
+              child._gui_borderColor = child.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.EVALUATEDNODEBORDERCOLOR;
+            }
+          }
         })
       }
     }
+    // the node was not in the list and none of its children -> collapse it and remove it from ExpansionPath
     else
     {
       this.removeNode(node);
@@ -339,26 +294,22 @@ module.exports = {
       expansionPath.reset();
       _.each(nodes, function(node) {
         node.collapse();
-        node.setFlag("NONE")
+        node._gui_shownPattern = ""
       });
       event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
-    ipc.on('showParallelPatterns',function(event){
+    ipc.on('showANode',function(event,searchedNode,pattern){
       expansionPath.reset();
-      expansionPath.expandPipelineNodes()
+      let searchNodes = Array(1).fill(searchedNode);
+      let searchPatterns = Array(1).fill(pattern);
+      expansionPath.expandToNodes(searchNodes,searchPatterns,true)
       event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
-    ipc.on('showANode',function(event,searchedNode){
+    ipc.on('showAllNodes',function(event,nodeIds,nodePatterns){
       expansionPath.reset();
-      expansionPath.expandToANode(searchedNode)
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
-    });
-
-    ipc.on('showAllNodes',function(event,nodeIds){
-      expansionPath.reset();
-      expansionPath.expandToNodes(nodeIds);
+      expansionPath.expandToNodes(nodeIds,nodePatterns);
       event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     })
     ipc.on('showNodes',function(event,searchedNodesId){
@@ -468,19 +419,9 @@ module.exports = {
        * @param {Node} node     
        * @param {String} shape  shape of the node
        */
-      function createNode(node,shape){
+      function createNode(node){
         let tempDiagraph = "";
-        if (node._flagged=="PATTERN_CHILDREN" && node._evaluate)
-        {
-          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#F5BDA2";fillcolor="#F5BDA2";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
-        }
-        else if(node._pipelineScalarValue > g_pipelineThreshold || node._doAllScalarValue > g_doAllThreshold || node._geometricDecomposition == 1 ){//
-          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#bbc6dd";fillcolor="#bbc6dd";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
-        }
-        else
-        {
-          tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + shape + ';color="#A4A4A4";fillcolor="white";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=0.5,height=0.2];';
-        }
+        tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' + node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
         return tempDiagraph;
       }
       /**
@@ -506,8 +447,7 @@ module.exports = {
               addSubgraph(child);
             } else if (child.type == 0) {
               checkedNodes.push(child.id);
-              // check if the node is flagged -> highlight
-              digraph += '\n' + createNode(child,'Mrecord');// + child.id + ' [id=' + child.id + ', shape=rect;label=' + createLabel(child) + ', style="filled"];';
+              digraph += '\n' + createNode(child);
 
               // Add edges to successors and predecessors of CU
               _.each(child.successors, function(successor) {
@@ -563,7 +503,7 @@ module.exports = {
           digraph += '\nlabel=' + createLabel(node) + ';';
           digraph += 'style="rounded"';
           digraph += 'bgcolor="#EDF1F2"'
-          if(node._flagged =="PATTERN_PARENT"){digraph += 'color="#028d35"';}
+          digraph += 'color="' + node._gui_borderColor + '"';
           digraph += '\nid=' + node.id;
           digraph += "\n}";
           if(node.expandDependency)
@@ -572,19 +512,7 @@ module.exports = {
             // we create here the edge DOT language
           }
         } else {
-          var shape;
-          switch (node.type) {
-            case 1:
-              shape = "hexagon";
-              break;
-            case 2:
-              shape = "ellipse";
-              break;
-            case 3:
-              shape = "diamond";
-              break;
-          }
-          digraph += "\n" + createNode(node,shape);// + node.id + ' [id=' + node.id + ', shape="' + shape + '", label=' + createLabel(node) + ', style="filled"];';
+          digraph += "\n" + createNode(node);// + node.id + ' [id=' + node.id + ', shape="' + shape + '", label=' + createLabel(node) + ', style="filled"];';
         }
       }
 
@@ -602,7 +530,7 @@ module.exports = {
 	  
       // Add function-call and dependency edges outside of subgraphs. Correct clustering breaks otherwise
       _.each(functionCallEdges, function(edge) {
-        digraph += '\n' + edge + ' [style=dotted, id="' + edge.replace(' -> ', 't') + '"];';
+        digraph += '\n' + edge + ' [style=filled, id="' + edge.replace(' -> ', 't') + '",arrowsize=.5,penwidth="0.5"];';
       });
       _.each(dependencyEdges, function(edge) {
           digraph += edge;          

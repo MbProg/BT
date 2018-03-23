@@ -8,7 +8,7 @@ button#btnShowAllNodes{
     margin-top: 5px;
 }
 .col-auto{
-margin-top: 10px;
+margin-bottom: 10px;
 }
 
 label{
@@ -16,9 +16,12 @@ label{
 }
 
 label#lblClickNode {
-    font-weight: 100;
+    font-weight: 700;
     font-size: 12px;
+    margin-top: 10px;
+    color: rgb(35, 58, 128);
 }
+
 text{
     cursor: default;
     user-select: none;
@@ -29,4 +32,10 @@ text{
     -ms-user-select: none;
     /* IE/Edge */
     -webkit-touch-callout: none;
+}
+
+.form-check.mb-2 {margin-left: 7px;margin-top: 0px;}
+
+label.form-check-label {
+    font-size: 13px;
 }

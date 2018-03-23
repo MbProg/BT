@@ -1,5 +1,7 @@
 'use strict';
 
+const CONSTANTS = require('../general/constants');
+var _ = require('lodash');
 
 /**
  * Represents a basic DiscoPoP node
@@ -46,8 +48,14 @@ class Node {
     this._doAllScalarValue = doAllScalarValue;
     this._geometricDecomposition = geometricDecomposition;
     this._taskParallelism = taskParallelism;
-    this._flagged = "NULL";
     this._evaluate = evaluate;
+    // GUI Attributes
+    this._flagged = "NULL";
+    this._gui_shape = "Mrecord"           // default type for CU
+    this._gui_size = "6";                 // if it has children the size gets bigger
+    this._gui_shownPattern = "";          // the pattern the current node is showing 
+    this._gui_fillcolor = "white";        // defualt white filled color
+    this._gui_borderColor = "#A4A4A4";    // default grey border
   }
 
   /**
@@ -216,6 +224,33 @@ class Node {
   dependencyCollapse(){
     this._dependencyCollapsed = true;
   }
+
+  containsPattern(pipelineThreshold,doAllThreshold){
+    if(this._pipelineScalarValue>=pipelineThreshold || this._doAllScalarValue >= doAllThreshold || this._geometricDecomposition ){
+      return true;
+    }
+    _.each(this._childrenDetails,(node)=>{
+      if(node.mwtype == CONSTANTS.WORKER && node._evaluate){return true;}
+      if(node.mwtype == CONSTANTS.BARRIER && node._evaluate){return true;}      
+    });
+    return false;  
+  }
+
+  getBiggestPattern(pipelineThreshold,doAllThreshold){
+    var p = (this._pipelineScalarValue>=pipelineThreshold)?this._pipelineScalarValue:0;
+    var d = (this._doAllScalarValue>=doAllThreshold)?this._doAllScalarValue:0;
+    var g = this._geometricDecomposition;
+    var m = 0;
+    _.each(this._childrenDetails,function(node){
+      if(node.mwtype == CONSTANTS.WORKER && node._evaluate){m = 1;}
+      if(node.mwtype == CONSTANTS.BARRIER && node._evaluate){m = 1;}      
+    });
+    if(p>=d && p>=g && p>=m){return CONSTANTS.PIPELINE;}
+    if(d>=g && d>=m){return CONSTANTS.DOALL;}
+    if(g>=m){return g;}else{return CONSTANTS.GEOMETRICDECOMPOSITION;}
+    if(m>0){return CONSTANTS.TASKPARALLELISM}
+    return ""
+  }
 }
 
 /**
@@ -258,6 +293,9 @@ class CuNode extends Node {
       this._predecessors = [];
       this._depsOn = false;
       this._lines = temp;
+      this._gui_shape = 'Mrecord'
+      this._gui_size = (this._childrenDetails.length)?{width:0.6,height:0.3}:{width:0.5,height:0.2};
+
     }
     /**
      * Add a successor CU to this node, and add this node to the predecessors of the added CU
@@ -399,7 +437,9 @@ class LoopNode extends Node {
     super(id, originalId, fileId, depGoodDotString, depBadDotString, depGoodPipelineDotString, depBadPipelineDotString, depGoodTPDotString, depBadTPDotString, 2, childrenDetails, startLine, endLine, readDataSize, writeDataSize, readLines, writeLines, heatFactor,pipelineScalarValue,doAllScalarValue,geometricDecomposition,taskParallelism,evaluate);
     this._level = level;
     this._descendantNodeCount = descendantNodeCount;
-  }
+    this._gui_shape = 'ellipse'
+    this._gui_size = (this._childrenDetails.length)?{width:0.6,height:0.3}:{width:0.5,height:0.2};
+}
 
   /**
    * The nested-level of the loop
@@ -468,7 +508,9 @@ class FunctionNode extends Node {
     this._name = name;
     this._arguments = [];
     this._descendantNodeCount = descendantNodeCount;
-  }
+    this._gui_shape = 'rect'
+    this._gui_size = (this._childrenDetails.length)?{width:0.6,height:0.3}:{width:0.5,height:0.2};
+}
 
   /**
    * The name of the function

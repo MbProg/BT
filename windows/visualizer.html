@@ -40,7 +40,7 @@
   <div id="menu-bar" style="position: fixed; width: 350px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: 0px;"
     class="left-shadow-overlay">
     <div class="handle">
-      <span class="glyphicon glyphicon-chevron-right" id="glyphicon1"></span>      
+      <span class="glyphicon glyphicon-chevron-left" id="glyphicon1"></span>      
       <table>
         <tbody>
           <tr>
@@ -89,6 +89,7 @@
                           <option>All Pipeline</option>
                           <option>All Do-All</option>
                           <option>All Geometric Decomposition</option>
+                          <option>All Task Parallelism</option>
                           <option>All Patterns</option>
                       </select>
                   </div>
@@ -112,82 +113,23 @@
  
               </tbody>
             </table>
-            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnResetAllNodes">Reset clicked Nodes</button>
-            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnShowAllNodes">Show all nodes in the graph</button>
+            <label class="form-check-label" for="cbNegDependencies" id="lblClickNode">Check to show dependency of the selected node:</label>
             <div class="col-auto">
               <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="cbAllDependencies" onclick='showAllDependencies(this)'>
-                <label class="form-check-label" for="cbAllDependencies">Show all dependencies</label>
+                <label class="form-check-label" for="cbAllDependencies">Show all dependencies of selected node</label>
               </div>
               <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="cbNegDependencies" onclick='showWeakDependencies(this)'>
-                <label class="form-check-label" for="cbNegDependencies">Show negative dependencies</label>
+                <label class="form-check-label" for="cbNegDependencies">Show negative dependencies of selected node</label>
               </div>
             </div>
+            
+            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnResetAllNodes">Reset clicked Nodes</button>
+            <button type="button" class="btn btn-primary btn-sm btn-block" id="btnShowAllNodes">Show all nodes in the graph</button>
           </div>
       </div>
     </div>
-    <!-- <a href="#include">How to include</a>
-    <a href="#use">How to use</a>
-    <a href="#method">Methods</a>
-    <a href="#option">Options</a> -->
-    <!-- <div class="sidebarElem">
-      <div class="[ form-group ]">
-        <input type="checkbox" name="fancy-checkbox-default" id="fancy-checkbox-default" autocomplete="off" onclick='handleClick(this);' checked
-        />
-        <div class="[ btn-group ]">
-          <label for="fancy-checkbox-default" class="[ btn btn-default ]">
-            <span class="[ glyphicon glyphicon-ok ]"></span>
-            <span>&nbsp;</span>
-          </label>
-          <label for="fancy-checkbox-default" class="[ btn btn-default active ]">
-            Show Code
-          </label>
-        </div>
-      </div>
-    </div> -->
-    <!-- <div class="sidebarElem">
-      <div class="[ form-group ]">
-        <input type="checkbox" name="fancy-cbShowPipelines" id="fancy-cbShowPipelines" autocomplete="off" onclick='showPipelines(this);' checked
-        />
-        <div class="[ btn-group ]">
-          <label for="fancy-cbShowPipelines" class="[ btn btn-default ]">
-            <span class="[ glyphicon glyphicon-ok ]"></span>
-            <span>&nbsp;</span>
-          </label>
-          <label for="fancy-cbShowPipelines" class="[ btn btn-default active ]">
-            Show Pipelines
-          </label>
-        </div>
-      </div>
-    </div>  -->
-    <!-- <div class="sidebarElem">
-      <div class="[ form-group ]">
-        <button type="button" class="btn btn-default" onclick="showPipelines()">Show Pipelines</button>
-      </div>
-      <div class="[ form-group ]">
-        <input type="checkbox" name="fancy-cbPipelineDependencies" id="fancy-cbPipelineDependencies" autocomplete="off" onclick='showWeakDependencies(this);' checked=""
-        />
-        <div class="[ btn-group ]">
-          <label for="fancy-cbPipelineDependencies" class="[ btn btn-default ]">
-            <span class="[ glyphicon glyphicon-ok ]"></span>
-            <span>&nbsp;</span>
-          </label>
-          <label for="fancy-cbPipelineDependencies" class="[ btn btn-default active ]">
-            Negative dependencies
-          </label>
-        </div>
-      </div>
-    </div>    
-  <div class="sidebarElem">
-        <div class="container">
-            <div class="panel-group" id="accordion">
-              
-              
-            </div>
-        </div>
-  </div> -->
-
   </div>
 
   <table id="visualizer-table" border="1">
@@ -430,32 +372,39 @@
     </tr>
     <tr>
       <td id="tdlblNode" style="height:20px;">
+        <div id="NodeCaptionContainer">
         <div id="lblCaption" class="pretty p-default p-thick p-pulse">
-            <p class="noMargin">Node: 1:9 &nbsp;&nbsp;&nbsp;&nbsp; Type: Function &nbsp;&nbsp;&nbsp;&nbsp; Read: 32B &nbsp;&nbsp;&nbsp;&nbsp; Write: 64B &nbsp;&nbsp;&nbsp;&nbsp; </p>
+            <p class="noMargin">Node: &nbsp;&nbsp;&nbsp;&nbsp; Type:  &nbsp;&nbsp;&nbsp;&nbsp; Read:  &nbsp;&nbsp;&nbsp;&nbsp; Write:  &nbsp;&nbsp;&nbsp;&nbsp; </p>
           </div>
-        <div class="pretty p-default p-thick p-pulse">
-            <input type="checkbox" id="cbPipeline" onclick='cbPipelineClicked(this)' />
+
+          <div class="pretty p-default p-thick p-pulse">
+            <input type="radio" name="radio66" id="rbPipeline" onclick='rbPipelineClicked(this)'>
             <div class="state p-info-o">
+                <i class="icon mdi mdi-check"></i>
                 <label id="lblPipeline">Pipeline</label>
             </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-            <input type="checkbox" id="cbDoAll" />
+          </div>
+          <div class="pretty p-default p-thick p-pulse">
+            <input type="radio" name="radio66" id="rbDoAll" onclick="rbDoAllClicked(this)"> 
             <div class="state p-info-o">
+                <i class="icon mdi mdi-check"></i>
                 <label id="lblDoAll">Do-All</label>
             </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-            <input type="checkbox" id="cbGeoDecomp" />
+          </div>
+          <div class="pretty p-default p-thick p-pulse">
+            <input type="radio" name="radio66" id="rbGeoDecomp" onclick="rbGeoDecompClicked(this)"> 
             <div class="state p-info-o">
+                <i class="icon mdi mdi-check"></i>
                 <label id="lblGeoDecomp">Geometric Decomposition</label>
             </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-            <input type="checkbox" id="cbTaskParallelism" />
+          </div>
+          <div class="pretty p-default p-thick p-pulse">
+            <input type="radio" name="radio66" id="rbTaskParallelism" onclick="rbTaskParallelismClicked(this)"> 
             <div class="state p-info-o">
+                <i class="icon mdi mdi-check"></i>
                 <label id="lblTaskParallelism">Task Parallelism</label>
             </div>
+          </div>
         </div>
 
       </td>
@@ -490,13 +439,8 @@
       // autoEscape: false,
 
       shown: function (obj) {
-        // obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
-        // obj.find(".handle").html('<span class="glyphicon glyphicon glyphicon glyphicon-cog"></span>');
-        // obj.addClass("left-shadow-overlay");
       },
       hidden: function (obj) {
-        // obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
-        // obj.removeClass("left-shadow-overlay");
       }
     });
 
@@ -510,15 +454,15 @@
     var codecontainier = document.getElementById("code-container");
     var settingscontainer = document.getElementById("settings-container");
     // convert right to left or opp
-    if (rightIcon.classList.contains("glyphicon-chevron-right")){
-    rightIcon.classList.remove("glyphicon-chevron-right");
-    rightIcon.classList.add("glyphicon-chevron-left");
+    if (rightIcon.classList.contains("glyphicon-chevron-left")){
+    rightIcon.classList.remove("glyphicon-chevron-left");
+    rightIcon.classList.add("glyphicon-chevron-right");
     codecontainier.classList.add("active");
     codecontainier.classList.add("in");
     document.getElementById("td_line_codeContainer").style.borderLeft = "#524E4E solid 6px"
     }else{
-      rightIcon.classList.add("glyphicon-chevron-right");
-      rightIcon.classList.remove("glyphicon-chevron-left");
+      rightIcon.classList.add("glyphicon-chevron-left");
+      rightIcon.classList.remove("glyphicon-chevron-right");
       codecontainier.classList.remove("active");
       codecontainier.classList.remove("in");
       document.getElementById("td_line_codeContainer").style.borderLeft = "#2E2E2E solid 6px"
@@ -538,7 +482,7 @@
     var codecontainier = document.getElementById("code-container");
     var settingscontainer = document.getElementById("settings-container");
     var rightIcon = document.getElementById("glyphicon1");
-    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    if (rightIcon.classList.contains("glyphicon-chevron-left")){
     rightIcon.click();
       }
     // toogle the grey rectangles next to the icons
@@ -558,7 +502,7 @@
     var codecontainier = document.getElementById("code-container");
     var settingscontainer = document.getElementById("settings-container");
     var rightIcon = document.getElementById("glyphicon1");
-    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    if (rightIcon.classList.contains("glyphicon-chevron-left")){
     rightIcon.click();
       }
     // toogle the grey rectangles next to the icons
@@ -578,7 +522,7 @@
     var codecontainier = document.getElementById("code-container");
     var settingscontainer = document.getElementById("settings-container");
     var rightIcon = document.getElementById("glyphicon1");
-    if (rightIcon.classList.contains("glyphicon-chevron-right")){
+    if (rightIcon.classList.contains("glyphicon-chevron-left")){
     rightIcon.click();
       }
     // toogle the grey rectangles next to the icons

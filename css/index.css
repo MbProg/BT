@@ -298,3 +298,21 @@ div#lblCaption{
 p.noMargin{
 	margin-bottom: 0px;
 }
+
+
+div#NodeCaptionContainer{     
+    -webkit-animation: fadeAndScale .7s ease-in-out forwards;
+    animation: fadeAndScale .7s ease-in-out forwards;
+    text-shadow: 0 0 3px white, 0 0 3px white;
+}
+@keyframes fadeAndScale {
+    from {
+        opacity: 0;
+		transform: scale(0.95,1);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1, 1);
+		text-shadow: 0 0 0 rgb(255, 255, 255);
+    }
+}
