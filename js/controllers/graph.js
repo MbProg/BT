@@ -61,8 +61,8 @@ class ExpansionPath {
                   switch(childDetails.mwType){
                     case CONSTANTS.FORK:child._gui_fillcolor = CONSTANTS.FORKFILLCOLOR; break;
                     case CONSTANTS.WORKER:child._gui_fillcolor = CONSTANTS.WORKERFILLCOLOR; break;
-                    case CONSTANTS.BARRIER:child._gui_fillcolor = CONSTANTS.BARRIERFILLCOLOR; break;
-                    default: child._gui_fillcolor = CONSTANTS.BARRIERNONCONCOLOR; child._gui_borderColor = CONSTANTS.NORMALBORDERCOLOR; break;
+                    case CONSTANTS.CON_BARRIER:child._gui_fillcolor = CONSTANTS.CON_BARRIERFILLCOLOR; break;
+                    default: child._gui_fillcolor = CONSTANTS.NONCON_BARRIERFILLCOLOR; child._gui_borderColor = CONSTANTS.NORMALBORDERCOLOR; break;
                   }
                   child._gui_borderColor = child.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.EVALUATEDNODEBORDERCOLOR;
                   return;
@@ -421,7 +421,9 @@ module.exports = {
        */
       function createNode(node){
         let tempDiagraph = "";
-        tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' + node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
+        if(!node.expanded)
+          node._gui_borderColor = (node.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.NORMALBORDERCOLOR)
+        tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' +  node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
         return tempDiagraph;
       }
       /**

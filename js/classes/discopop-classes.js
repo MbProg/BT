@@ -54,8 +54,8 @@ class Node {
     this._gui_shape = "Mrecord"           // default type for CU
     this._gui_size = "6";                 // if it has children the size gets bigger
     this._gui_shownPattern = "";          // the pattern the current node is showing 
-    this._gui_fillcolor = "white";        // defualt white filled color
-    this._gui_borderColor = "#A4A4A4";    // default grey border
+    this._gui_fillcolor = CONSTANTS.NORMALFILLCOLOR;        // defualt white filled color
+    this._gui_borderColor = CONSTANTS.NORMALBORDERCOLOR;    // default grey border
   }
 
   /**

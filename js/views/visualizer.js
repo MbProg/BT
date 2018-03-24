@@ -429,7 +429,7 @@ ipc.on('init-listeners', function (event) {
 			$('#rbGeoDecomp').attr("disabled",(node._geometricDecomposition == 0)) 
 			$('#rbTaskParallelism').attr("disabled",(node._taskParallelism == 0))			
 
-			$("#lblTaskParallelism").html('Task Parallelism: Fork:[' + fork.substring(0,fork.length-1) + '] - Worker:[' + worker.substring(0,worker.length-1) + '] - Conc. Barrier:[' + conBarrier.substring(0,conBarrier.length-1) + '] - Nonconc. Barrier:[' + nonconBarrier.substring(0,nonconBarrier.length-1) + ']')
+			$("#lblTaskParallelism").html('Task Parallelism: <font color = "' + (fork!=""?CONSTANTS.FORKFILLCOLOR:"")+ '">Fork:[' + fork.substring(0,fork.length-1) + ']</font> - <font color = "' + (worker!=""?CONSTANTS.WORKERFILLCOLOR:"")+ '">Worker:[' + worker.substring(0,worker.length-1) + ']</font> - <font color = "' + (conBarrier!=""?CONSTANTS.CON_BARRIERFILLCOLOR:"")+ '">Conc. Barrier:[' + conBarrier.substring(0,conBarrier.length-1) + ']</font> - <font color = "' + (nonconBarrier!=""?CONSTANTS.NONCON_BARRIERFILLCOLOR:"")+ '">Nonconc. Barrier:[' + nonconBarrier.substring(0,nonconBarrier.length-1) + ']</font>')
 			// rerun the animation
 			var el = document.getElementById('NodeCaptionContainer');
 			el.style.animation = 'none';
