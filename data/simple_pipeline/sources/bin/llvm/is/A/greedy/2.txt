@@ -1,0 +1,53 @@
+
+
+ NAS Parallel Benchmarks (NPB3.3-SER) - IS Benchmark
+
+ Size:  8388608  (class A)
+ Iterations:   10
+
+   iteration
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+        8
+        9
+        10
+
+
+ IS Benchmark Completed
+ Class           =                        A
+ Size            =                  8388608
+ Iterations      =                       10
+ Time in seconds =                     0.35
+ Mop/s total     =                   237.87
+ Operation type  =              keys ranked
+ Verification    =               SUCCESSFUL
+ Version         =                    3.3.1
+ Compile date    =              03 Mar 2016
+
+ Compile options:
+    CC           = (none)
+    CLINK        = (none)
+    C_LIB        = (none)
+    C_INC        = -I ../common 
+    CFLAGS       = (none)
+    CLINKFLAGS   = (none)
+
+--------------------------------------
+ Please send all errors/feedbacks to:
+ Center for Manycore Programming
+ cmp@aces.snu.ac.kr
+ http://aces.snu.ac.kr
+--------------------------------------
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1            4128008636        cycles                   
+CPU1                 14.83 Joules power/energy-cores/                                         
+
+       1.183966411 seconds time elapsed
+

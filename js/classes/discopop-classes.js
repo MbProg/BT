@@ -38,8 +38,8 @@ class Node {
     this._collapsed = true;
     this._dependencyCollapsed = true;
     this._depsOn = false;
-    this._depGoodDotString = depGoodDotString;
-    this._depBadDotString = depBadDotString
+    this._depGoodDoAllDotString = depGoodDotString;
+    this._depBadDoAllDotString = depBadDotString
     this._depGoodPipelineDotString = depGoodPipelineDotString;
     this._depBadPipelineDotString = depBadPipelineDotString;
     this._depGoodTPDotString = depGoodTPDotString;

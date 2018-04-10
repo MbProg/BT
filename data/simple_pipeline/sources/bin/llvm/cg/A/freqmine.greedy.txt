@@ -1,0 +1,170 @@
+************** main************** 
+Number of live intervals: 1083 
+
+Intervals more than 20,000: 3 
+Intervals more than 10,000: 4 
+Intervals more than 5,000: 10 
+Intervals more than 4,000: 8 
+Intervals more than 3,000: 17 
+Intervals more than 2,000: 11 
+Intervals more than 1,000: 26 
+Intervals more than 500: 37 
+Intervals more than 400: 15 
+Intervals more than 300: 17 
+Intervals more than 200: 22 
+Intervals more than 100: 34 
+Intervals more than 50: 44 
+Empty live intervals: 38 
+************** conj_grad************** 
+Number of live intervals: 279 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 6 
+Intervals more than 4,000: 4 
+Intervals more than 3,000: 1 
+Intervals more than 2,000: 1 
+Intervals more than 1,000: 9 
+Intervals more than 500: 13 
+Intervals more than 400: 3 
+Intervals more than 300: 5 
+Intervals more than 200: 1 
+Intervals more than 100: 9 
+Intervals more than 50: 7 
+Empty live intervals: 19 
+************** print_results************** 
+Number of live intervals: 124 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 8 
+Intervals more than 1,000: 6 
+Intervals more than 500: 3 
+Intervals more than 400: 1 
+Intervals more than 300: 1 
+Intervals more than 200: 0 
+Intervals more than 100: 2 
+Intervals more than 50: 2 
+Empty live intervals: 5 
+************** randlc************** 
+Number of live intervals: 33 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 4 
+Intervals more than 400: 2 
+Intervals more than 300: 0 
+Intervals more than 200: 0 
+Intervals more than 100: 3 
+Intervals more than 50: 1 
+Empty live intervals: 9 
+************** vranlc************** 
+Number of live intervals: 44 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 5 
+Intervals more than 500: 5 
+Intervals more than 400: 0 
+Intervals more than 300: 0 
+Intervals more than 200: 2 
+Intervals more than 100: 2 
+Intervals more than 50: 1 
+Empty live intervals: 9 
+************** timer_clear************** 
+Number of live intervals: 2 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 0 
+Intervals more than 400: 0 
+Intervals more than 300: 0 
+Intervals more than 200: 0 
+Intervals more than 100: 0 
+Intervals more than 50: 0 
+Empty live intervals: 2 
+************** timer_start************** 
+Number of live intervals: 4 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 0 
+Intervals more than 400: 0 
+Intervals more than 300: 0 
+Intervals more than 200: 0 
+Intervals more than 100: 1 
+Intervals more than 50: 0 
+Empty live intervals: 2 
+************** timer_stop************** 
+Number of live intervals: 6 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 0 
+Intervals more than 400: 0 
+Intervals more than 300: 0 
+Intervals more than 200: 0 
+Intervals more than 100: 1 
+Intervals more than 50: 2 
+Empty live intervals: 1 
+************** timer_read************** 
+Number of live intervals: 3 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 0 
+Intervals more than 400: 0 
+Intervals more than 300: 0 
+Intervals more than 200: 0 
+Intervals more than 100: 0 
+Intervals more than 50: 0 
+Empty live intervals: 3 
+************** wtime_************** 
+Number of live intervals: 16 
+
+Intervals more than 20,000: 0 
+Intervals more than 10,000: 0 
+Intervals more than 5,000: 0 
+Intervals more than 4,000: 0 
+Intervals more than 3,000: 0 
+Intervals more than 2,000: 0 
+Intervals more than 1,000: 0 
+Intervals more than 500: 0 
+Intervals more than 400: 1 
+Intervals more than 300: 0 
+Intervals more than 200: 1 
+Intervals more than 100: 1 
+Intervals more than 50: 1 
+Empty live intervals: 2 

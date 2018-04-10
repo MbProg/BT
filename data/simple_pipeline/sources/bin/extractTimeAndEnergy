@@ -1,0 +1,48 @@
+#!/bin/bash
+# script that that runs each register allocation 5 times and saves the results ina separate file.
+# You can find each executable file under ./llvm/APP/app.S.regalloc.Time
+# 25.2.2016 Created by Mohammad
+
+cd ./llvm 
+
+    for result in lu/ ; do
+    echo $result 
+    cd ${result}
+    app=${PWD##*/}
+
+        echo $app
+
+        for classDir in A/ ; do
+        echo $classDir 
+        cd ${classDir}
+        class=${PWD##*/}
+
+            echo $class
+
+            for regAllocDir in */ ; do
+            echo $regAllocDir 
+            cd ${regAllocDir}
+            regAlloc=${PWD##*/}
+
+                echo $regAlloc
+
+                    
+                    rm time.txt
+                    rm energy.txt
+
+                        for i in {1..5}
+                        do
+                            awk '/Time in seconds =/ {print $5}' $i.txt >> time.$app.$class.$regAlloc.txt 2>&1
+
+                            awk -v RS='CPU1' 'NR==3 && $0=$1' $i.txt >> energy.$app.$class.$regAlloc.txt 2>&1
+
+                        done
+
+            cd ..
+            done
+
+        cd .. # exit classDir
+        done
+
+    cd .. # exit app
+    done

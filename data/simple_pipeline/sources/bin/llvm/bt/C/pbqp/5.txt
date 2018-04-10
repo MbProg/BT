@@ -1,0 +1,9 @@
+taskset: executing ./bt.C.pbqp.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1285527        cycles                   
+CPU1                  0.01 Joules power/energy-cores/                                         
+
+       0.000381242 seconds time elapsed
+

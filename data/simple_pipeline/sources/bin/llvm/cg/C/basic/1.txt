@@ -1,0 +1,9 @@
+taskset: executing ./cg.C.basic.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1401391        cycles                   
+CPU1                  0.02 Joules power/energy-cores/                                         
+
+       0.000390206 seconds time elapsed
+

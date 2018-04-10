@@ -1,0 +1,51 @@
+
+
+ NAS Parallel Benchmarks (NPB3.3-SER-C) - FT Benchmark
+
+ Size                :  256x 256x 128
+ Iterations          :              6
+
+ T =    1     Checksum =    5.046735008193E+02    5.114047905510E+02
+ T =    2     Checksum =    5.059412319734E+02    5.098809666433E+02
+ T =    3     Checksum =    5.069376896287E+02    5.098144042213E+02
+ T =    4     Checksum =    5.077892868474E+02    5.101336130759E+02
+ T =    5     Checksum =    5.085233095391E+02    5.104914655194E+02
+ T =    6     Checksum =    5.091487099959E+02    5.107917842803E+02
+ Verification test for FT successful
+
+
+ FT Benchmark Completed.
+ Class           =                        A
+ Size            =            256x 256x 128
+ Iterations      =                        6
+ Time in seconds =                     3.09
+ Mop/s total     =                  2313.15
+ Operation type  =           floating point
+ Verification    =               SUCCESSFUL
+ Version         =                    3.3.1
+ Compile date    =              03 Mar 2016
+
+ Compile options:
+    CC           = (none)
+    CLINK        = (none)
+    C_LIB        = (none)
+    C_INC        = -I ../common 
+    CFLAGS       = (none)
+    CLINKFLAGS   = (none)
+    RAND         = randdp
+
+--------------------------------------
+ Please send all errors/feedbacks to:
+ Center for Manycore Programming
+ cmp@aces.snu.ac.kr
+ http://aces.snu.ac.kr
+--------------------------------------
+
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1           13418126069        cycles                   
+CPU1                 64.80 Joules power/energy-cores/                                         
+
+       3.847463316 seconds time elapsed
+

@@ -1,0 +1,30 @@
+#!/bin/bash
+# script that compiles NAS applications with different register allocation algorithms.
+# You can find each executable file under ./llvm/APP/app.$class.regalloc.o
+# 25.2.2016 Created by Mohammad
+
+cd ./llvm 
+
+for result in */ ; do
+	echo $result 
+    cd ${result}
+    app=${PWD##*/}
+
+    echo $app
+
+    for classDir in */ ; do
+	echo $classDir 
+    cd ${classDir}
+    class=${PWD##*/}
+
+    echo $class
+
+    sudo rm -R -f *
+
+    cd ..
+
+	done
+
+	cd ..
+
+done

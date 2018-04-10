@@ -1,0 +1,9 @@
+taskset: executing ./cg.C.greedy.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1288049        cycles                   
+CPU1                  0.02 Joules power/energy-cores/                                         
+
+       0.000360519 seconds time elapsed
+

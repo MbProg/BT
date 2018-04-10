@@ -167,8 +167,8 @@ class ExpansionPath {
 module.exports = {
   controller: function controller(nodes, rootNodes) {
     var expansionPath = new ExpansionPath(rootNodes);
-    var expandNodeDependency;
     var showWeakDependency;
+    var nodeOnFocus;
     var showAllDependencies;
     function findFirstVisibleAncestor(node) {
       if (!node.parents.length)
@@ -235,26 +235,12 @@ module.exports = {
       event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     })
 
-    ipc.on('expandDependency', function(event,nodeId,expandDependency)
-  {
-    console.log("Test");
-    console.log('expandOne', nodeId);
-    nodes[nodeId].expandDependency = !nodes[nodeId].expandDependency;
-    if(nodes[nodeId].expandDependency)
-      expandNodeDependency = nodeId;
-    else
-      expandNodeDependency = -1;
 
-    var node = nodes[nodeId];
-    if (node.type >= 0 && node.type < 3) {
-      expansionPath.addNode(node);
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
-    }
-  })
     ipc.on('expandNode', function(event, nodeId) {
       console.log("Test");
       console.log('expandOne', nodeId);
       var node = nodes[nodeId];
+      nodeOnFocus = node;
       if (node.type >= 0 && node.type < 3) {
         expansionPath.addNode(node);
         event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
@@ -263,10 +249,38 @@ module.exports = {
 
     ipc.on('collapseNode', function(event, nodeId) {
       var node = nodes[nodeId];
-      expansionPath.removeNode(node);
+      nodeOnFocus = node;
+      var stack = [];
+      var seen = [];
+      stack.push(node);
+      do {
+        node = stack.pop();
+        if (seen.indexOf(node.id) == -1) {
+          seen.push(node.id);
+          node.collapse();
+          node._gui_shownPattern = ""
+          expansionPath.removeNode(node);
+          _.each(node.children, function(childNode) {
+            if (childNode.children.length) {
+              stack.push(childNode);
+            }
+          });
+        }
+      }
+      while (stack.length);
       event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
     });
 
+    ipc.on('nodeClicked',function(event,nodeId){
+      // if node is expanded and dependency should be shown -> show the dependencies of the children of this node
+      var node = nodes[nodeId];
+      nodeOnFocus = node;
+      if(node.expanded && node._gui_shownPattern !=""){
+        if(showWeakDependency){
+          event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+        }
+      }
+    });
     ipc.on('expandAll', function(event, nodeId) {
       console.log('expandAll', nodeId);
       var node = nodes[nodeId];
@@ -344,6 +358,7 @@ module.exports = {
 
     ipc.on('expandTo', function(event, nodeId) {
       var currentNode = nodes[nodeId];
+      showANode = currentNode;
       var queue = [];
       // Find nearest visible ancestor of the given node to start expanding
 		  // from
@@ -423,6 +438,11 @@ module.exports = {
         let tempDiagraph = "";
         if(!node.expanded)
           node._gui_borderColor = (node.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.NORMALBORDERCOLOR)
+        // if(node._parents.indexOf(nodeOnFocus)<0)
+        // {
+        //   node._gui_fillcolor = CONSTANTS.NORMALFILLCOLOR;
+        //   node._gui_fillcolor = CONSTANTS.NORMALBORDERCOLOR;
+        // }
         tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' +  node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
         return tempDiagraph;
       }
@@ -456,7 +476,7 @@ module.exports = {
                 visibleAncestor = findFirstVisibleAncestor(successor);
                 edge = child.id + ' -> ' + visibleAncestor.id;
                 if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
-                  digraph += "\n" + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="#717070",arrowsize=.5];';
+                  digraph += "\n" + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
                   addedFlowEdges.push(edge);
                 }
               });
@@ -464,7 +484,7 @@ module.exports = {
                 visibleAncestor = findFirstVisibleAncestor(predecessor);
                 edge = visibleAncestor.id + " -> " + child.id;
                 if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
-                  digraph += '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '",color="#717070",arrowsize=.5];';
+                  digraph += '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
                   addedFlowEdges.push(edge);
                 }
               });
@@ -485,7 +505,7 @@ module.exports = {
                     }
                   } else {
                     edge = child.id + ' -> ' + functionCall.id;
-                    digraph += '\n' + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="#717070",arrowsize=.5];';
+                    digraph += '\n' + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
                   }
                   functionNodes.push(functionCall);
                 });
@@ -537,42 +557,59 @@ module.exports = {
       _.each(dependencyEdges, function(edge) {
           digraph += edge;          
       });
-      
-      if(showWeakDependency)
+    
+      // create depedency DOT string for the children of the passed node
+      function addDependencyScript(node)
       {
-        _.each(expansionPath._patternDetectedNodes,(nd)=>{
-            if(nd._depBadDotString != "")
-            {
-              digraph +='{edge [id = ED' + nd.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + nd._depBadDotString + "}"
-            }
-            if(showAllDependencies && nd._depGoodDotString!="")
-            {
-              digraph +='{edge [id = ED' + nd.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + nd._depGoodDotString + "}"
-            }          
-        })
+        if (node == undefined){return "";};
+        
+        let depDotString = "";
+        if(showWeakDependency)
+        {
+            if (node.expanded){
+              if (node._gui_shownPattern == CONSTANTS.PIPELINE){
+                if(node._depBadPipelineDotString != "")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadPipelineDotString + "}"
+                }
+                if(showAllDependencies && node._depGoodPipelineDotString!="")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodPipelineDotString + "}"
+                }            
+              }
+              else if(node._gui_shownPattern == CONSTANTS.DOALL){
+                if(node._depBadDoAllDotString != "")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadDoAllDotString + "}"
+                }
+                if(showAllDependencies && node._depGoodDoAllDotString!="")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodDoAllDotString + "}"
+                }            
+              }
+              else if(node._gui_shownPattern == CONSTANTS.TASKPARALLELISM){
+                if(node._depBadDoAllDotString != "")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadTPDotString + "}"
+                }
+                if(showAllDependencies && node._depGoodDoAllDotString!="")
+                {
+                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodTPDotString + "}"
+                }            
+              }
+              else if(node._gui_shownPattern == CONSTANTS.GEOMETRICDECOMPOSITION){
 
-      }
-      // 
-      if (expandNodeDependency >= 0)
-      {
-        // then we should show the dependencies of this node
-        //edge [id = 1123, color="red",penwidth="3.0"]; 2 -> c -> e -> a [weight=1]
-        if(nodes[expandNodeDependency]._depGoodDotString != "")
-        {
-          digraph += '{edge [id = ED' + expandNodeDependency + ', color="blue",penwidth="3.0",style="dashed"]; ' + nodes[expandNodeDependency]._depGoodDotString + "}"
+              }
+              return depDotString;
+            }
+  
         }
-        if(nodes[expandNodeDependency]._depBadDotString != "")
-        {
-          digraph +='{edge [id = ED' + expandNodeDependency + ', color="red",penwidth="3.0",style="dashed"]; ' + nodes[expandNodeDependency]._depBadDotString + "}"
-        }
-        // highlight the children with a blue shape border
-        let highlightBorder = "{";
-        _.each(nodes[expandNodeDependency]._children,function(child){
-          highlightBorder += child._id + "[penwidth=2, color=blue, fillcolor=grey];"
-        })
-        highlightBorder += "}";
-        digraph += highlightBorder;
+              return depDotString;
       }
+
+      digraph += addDependencyScript(nodeOnFocus)
+
+
       // 
       digraph += "\n}";
       

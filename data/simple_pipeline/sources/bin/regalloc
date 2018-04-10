@@ -1,0 +1,52 @@
+#!/bin/bash
+# script that compiles NAS applications with different register allocation algorithms.
+# You can find each executable file under ./llvm/APP/app.$class.regalloc.o
+# 25.2.2016 Created by Mohammad
+
+cd ./llvm 
+
+for result in */ ; do
+	echo $result 
+    cd ${result}
+    app=${PWD##*/}
+
+    echo $app
+
+    for classDir in A ; do
+	echo $classDir 
+    cd ${classDir}
+    class=${PWD##*/}
+
+    echo $class
+
+		################################## bpqp ##################################
+
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -time-passes -regalloc=pbqp $app.$class.bc -o $app.$class.pbqp.$class > pbqp.regallocTime.$class.txt 2>&1;
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llvm-mc -filetype=obj $app.$class.pbqp.$class -o $app.$class.pbqp.$class.o
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/clang++ -fopenmp $app.$class.pbqp.$class.o -o $app.$class.pbqp.o
+		rm $app.$class.pbqp.$class
+		rm $app.$class.pbqp.$class.o
+
+		################################## greedy ##################################
+
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy $app.$class.bc -o $app.$class.greedy.$class > greedy.regallocTime.$class.txt 2>&1;
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llvm-mc -filetype=obj $app.$class.greedy.$class -o $app.$class.greedy.$class.o
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/clang++ -fopenmp $app.$class.greedy.$class.o -o $app.$class.greedy.o
+		rm $app.$class.greedy.$class
+		rm $app.$class.greedy.$class.o
+
+		################################## basic ##################################
+
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -time-passes -regalloc=basic $app.$class.bc -o $app.$class.basic.$class > basic.regallocTime.$class.txt 2>&1;
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/llvm-mc -filetype=obj $app.$class.basic.$class -o $app.$class.basic.$class.o
+		/home/norouzi/Desktop/software/llvmTemp/build/bin/clang++ -fopenmp $app.$class.basic.$class.o -o $app.$class.basic.o
+		rm $app.$class.basic.$class
+		rm $app.$class.basic.$class.o
+
+		cd ..
+
+	done
+
+	cd ..
+
+done

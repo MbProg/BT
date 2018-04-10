@@ -435,6 +435,9 @@ ipc.on('init-listeners', function (event) {
 			el.style.animation = 'none';
 			el.offsetHeight; /* trigger reflow */
 			el.style.animation = null; 
+			if(node.children.length){
+			ipc.send('nodeClicked', node.id);
+			}
 		}
 		$("#node-info-container").html(nodeDataTable);
 		$('#code-container-tab').trigger('click');
@@ -459,29 +462,6 @@ ipc.on('init-listeners', function (event) {
 
 		if (node.children.length) {
 			ipc.send('expandNode', node.id);
-		}
-	});
-
-
-	graphContainer.delegate('#a_pipeline', 'click', function (event) {
-		debugger;
-		event.stopImmediatePropagation();
-		var node = nodeData[this.parentElement.id];
-		var cuNodes, loopNodes, functionNodes;
-
-		if (node.children.length) {
-			ipc.send('expandDependency', node.id);
-		}
-	});
-
-	graphContainer.delegate('#a_doAll', 'click', function (event) {
-		debugger;
-		event.stopImmediatePropagation();
-		var node = nodeData[this.parentElement.id];
-		var cuNodes, loopNodes, functionNodes;
-
-		if (node.children.length) {
-			ipc.send('expandDependency', node.id);
 		}
 	});
 

@@ -1,0 +1,54 @@
+
+
+ NAS Parallel Benchmarks (NPB3.3-SER-C) - MG Benchmark
+
+ No input file. Using compiled defaults 
+ Size:   32x  32x  32  (class S)
+ Iterations:   4
+
+ Initialization time:           0.003 seconds
+
+  iter   1
+  iter   4
+
+ Benchmark completed
+ VERIFICATION SUCCESSFUL
+ L2 Norm is  5.3077070057349E-05
+ Error is    1.6596889470214E-13
+
+
+ MG Benchmark Completed.
+ Class           =                        S
+ Size            =             32x  32x  32
+ Iterations      =                        4
+ Time in seconds =                     0.00
+ Mop/s total     =                  3688.59
+ Operation type  =           floating point
+ Verification    =               SUCCESSFUL
+ Version         =                    3.3.1
+ Compile date    =              03 Mar 2016
+
+ Compile options:
+    CC           = (none)
+    CLINK        = (none)
+    C_LIB        = (none)
+    C_INC        = -I ../common 
+    CFLAGS       = (none)
+    CLINKFLAGS   = (none)
+    RAND         = randdp
+
+--------------------------------------
+ Please send all errors/feedbacks to:
+ Center for Manycore Programming
+ cmp@aces.snu.ac.kr
+ http://aces.snu.ac.kr
+--------------------------------------
+
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1              19963107        cycles                   
+CPU1                  0.09 Joules power/energy-cores/                                         
+
+       0.005930640 seconds time elapsed
+

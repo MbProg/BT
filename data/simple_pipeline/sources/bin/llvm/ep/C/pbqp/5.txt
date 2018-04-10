@@ -1,0 +1,9 @@
+taskset: executing ./ep.C.pbqp.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1385025        cycles                   
+CPU1                  0.02 Joules power/energy-cores/                                         
+
+       0.000387188 seconds time elapsed
+

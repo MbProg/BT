@@ -1,0 +1,32 @@
+	rm -rf *.txt *.s
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic bt.A.bc > bt.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy bt.A.bc > bt.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp bt.A.bc > bt.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic cg.A.bc > cg.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy cg.A.bc > cg.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp cg.A.bc > cg.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic ep.A.bc > ep.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy ep.A.bc > ep.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp ep.A.bc > ep.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic ft.A.bc > ft.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy ft.A.bc > ft.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp ft.A.bc > ft.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic is.A.bc > is.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy is.A.bc > is.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp is.A.bc > is.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic lu.A.bc > lu.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy lu.A.bc > lu.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp lu.A.bc > lu.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic mg.A.bc > mg.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy mg.A.bc > mg.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp mg.A.bc > mg.pbqp.txt 2>&1;
+
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=basic sp.A.bc > sp.basic.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=greedy sp.A.bc > sp.greedy.txt 2>&1;
+	/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -stats -regalloc=pbqp sp.A.bc > sp.pbqp.txt 2>&1;

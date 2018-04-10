@@ -1,0 +1,45 @@
+#!/bin/bash
+# script that that runs each register allocation 5 times and saves the results ina separate file.
+# You can find each executable file under ./llvm/APP/app.S.regalloc.Time
+# 25.2.2016 Created by Mohammad
+
+cd /home/norouzi/Desktop/software/benchmarks/NAS/NPB3.3-SER-C/bin/llvm 
+
+for result in lu/ ; do
+	echo $result 
+    cd ${result}
+    app=${PWD##*/}
+
+    echo $app
+
+    #for classDir in */ ; do
+	#echo $classDir 
+    cd A/ #cd ${classDir}
+    class=${PWD##*/}
+
+    echo $class
+
+		##### greedy results #####
+
+		mkdir -p pbqp/
+		mkdir -p greedy/
+		mkdir -p basic/
+		
+			for i in {1..5}
+			do
+				taskset -c 7 perf stat -A -C 0 -e cache-references,cache-misses,cycles,"power/energy-cores/" taskset -c 0 ./$app.$class.pbqp.o > ./pbqp/$i.txt 2>&1
+			done
+
+			for i in {1..5}
+			do
+				taskset -c 7 perf stat -A -C 0 -e cache-references,cache-misses,cycles,"power/energy-cores/" taskset -c 0 ./$app.$class.greedy.o > ./greedy/$i.txt 2>&1
+			done
+
+			for i in {1..5}
+			do
+				taskset -c 7 perf stat -A -C 0 -e cache-references,cache-misses,cycles,"power/energy-cores/" taskset -c 0 ./$app.$class.basic.o > ./basic/$i.txt 2>&1
+			done
+
+	cd ..
+
+done

@@ -1,0 +1,9 @@
+taskset: executing ./ep.C.basic.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1293788        cycles                   
+CPU1                  0.00 Joules power/energy-cores/                                         
+
+       0.000360755 seconds time elapsed
+

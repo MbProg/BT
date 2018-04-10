@@ -1,0 +1,9 @@
+taskset: executing ./bt.C.greedy.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1447195        cycles                   
+CPU1                  0.01 Joules power/energy-cores/                                         
+
+       0.000402346 seconds time elapsed
+

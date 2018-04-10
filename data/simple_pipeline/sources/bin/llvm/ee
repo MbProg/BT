@@ -1,0 +1,13 @@
+#!/bin/bash
+# script that that runs each register allocation 5 times and saves the results ina separate file.
+# You can find each executable file under ./llvm/APP/app.S.regalloc.Time
+# 25.2.2016 Created by Mohammad
+
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy bt/A/bt.A.bc > bt.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy cg/A/cg.A.bc > cg.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy ep/A/ep.A.bc > ep.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy ft/A/ft.A.bc > ft.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy is/A/is.A.bc > is.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy lu/A/lu.A.bc > lu.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy mg/A/mg.A.bc > mg.greedy.serial.txt 2>&1;
+/home/norouzi/Desktop/software/llvmTemp/build/bin/llc -regalloc=greedy sp/A/sp.A.bc > sp.greedy.serial.txt 2>&1;

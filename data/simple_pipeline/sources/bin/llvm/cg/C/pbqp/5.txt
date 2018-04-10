@@ -1,0 +1,9 @@
+taskset: executing ./cg.C.pbqp.o failed: No such file or directory
+
+ Performance counter stats for 'CPU(s) 1':
+
+CPU1               1415380        cycles                   
+CPU1                  0.00 Joules power/energy-cores/                                         
+
+       0.000395962 seconds time elapsed
+
