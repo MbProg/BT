@@ -163,7 +163,7 @@ svg text {
 }
 
 .ace_scrollbar {
-	height: 5px !important;
+	height: 100% !important;
 }
 
 #svg-canvas {

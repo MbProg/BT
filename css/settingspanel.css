@@ -49,3 +49,31 @@
       i.glyphicon {
             margin-right: 5px;
       }
+
+      .containerSettings{
+            width: 100%;
+      }
+      .settingsDiv{
+            color: black;
+            padding-top: 2px;
+            padding-bottom: 2px;            
+      }
+      .settingsBottom{
+            padding-bottom: 15px;
+      }
+      .settingsPanel-heading{
+            margin-top: 20px;
+      }
+
+      .patternlogos{
+            margin-bottom: 2px;
+            margin-right: 5px;
+      }
+
+      .shelp-container-settings{
+            margin-right: 10px;
+      }
+
+      .ul-settings{
+            font-size: 12px;
+      }

@@ -33,8 +33,9 @@ class ExpansionPath {
   {
     // first we expand the nodes and add them to the ExpansionPath, because we are going bottom up
     // if the node is not detected then we close them and remove them from ExpansionPath until we have reachted the root
+    let alreadyExpanded = node.expanded;
     this.addNode(node);
-    node.expand();
+    node.expand();    
     let childNodeIdMatched = false
     var temp = node._childrenDetails;
     _.each(node.children,(child)=>{
@@ -78,11 +79,14 @@ class ExpansionPath {
         })
       }
     }
-    // the node was not in the list and none of its children -> collapse it and remove it from ExpansionPath
+    // the node was not in the list and none of its children
+    // check if the node is not opened before by another event -> otherwise collapse it and remove it from ExpansionPath
     else
     {
-      this.removeNode(node);
-      node.collapse()
+      if(!alreadyExpanded){
+        this.removeNode(node);
+        node.collapse()
+      }
     }
     return node.expanded;
   }
@@ -148,6 +152,11 @@ class ExpansionPath {
     if (_.has(this._expansionLevelsPerNode, node.id)) {
       var level = this._expansionLevelsPerNode[node.id];
       var levelNodes = this._expandedNodesPerLevel[level];
+      if(levelNodes == undefined){
+        delete this._expansionLevelsPerNode[node.id]
+        node.collapse();
+        return;
+      }
       var index = levelNodes.indexOf(node);
       this._expandedNodesPerLevel[level].splice(index, 1);
       delete this._expansionLevelsPerNode[node.id];
@@ -197,7 +206,7 @@ module.exports = {
       } else {
         expansionPath.removeNode(nodes[nodeId]);
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     });
 
     /**
@@ -221,21 +230,22 @@ module.exports = {
     		  });
     	  }
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     });
 
     ipc.on('showWeakDependency',function(event,expandDependency){
       showWeakDependency = expandDependency
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     })
 
     ipc.on('showAllDependencies',function(event,expandDependency){
       showAllDependencies = expandDependency;
       showWeakDependency = expandDependency;
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     })
 
-
+    // 1. used when a node is dblclicked
+    // 2. used when in the context menu of a node action Expand is used 
     ipc.on('expandNode', function(event, nodeId) {
       console.log("Test");
       console.log('expandOne', nodeId);
@@ -243,10 +253,11 @@ module.exports = {
       nodeOnFocus = node;
       if (node.type >= 0 && node.type < 3) {
         expansionPath.addNode(node);
-        event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+        event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
       }
     });
 
+    // used when in the context menu of a node action Collapse is called
     ipc.on('collapseNode', function(event, nodeId) {
       var node = nodes[nodeId];
       nodeOnFocus = node;
@@ -268,19 +279,24 @@ module.exports = {
         }
       }
       while (stack.length);
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     });
 
+    // used when on a node a single left click is done
+    // visualizer.js first updates NodeCaptionContainer and then this event listener is called
     ipc.on('nodeClicked',function(event,nodeId){
       // if node is expanded and dependency should be shown -> show the dependencies of the children of this node
       var node = nodes[nodeId];
       nodeOnFocus = node;
-      if(node.expanded && node._gui_shownPattern !=""){
-        if(showWeakDependency){
-          event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
-        }
-      }
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      // if(node.expanded && node._gui_shownPattern !=""){
+      //   if(showWeakDependency){
+      //     event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
+      //   }
+      // }
     });
+
+    // used when 
     ipc.on('expandAll', function(event, nodeId) {
       console.log('expandAll', nodeId);
       var node = nodes[nodeId];
@@ -301,36 +317,35 @@ module.exports = {
         }
       }
       while (stack.length);
-      event.sender.send('update-graph', generateSvgGraph([nodes[nodeId]],expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph([nodes[nodeId]]));
     });
 
+    // used when btnResetAllNodes is clicked
     ipc.on('resetNodes',function(event){
       expansionPath.reset();
       _.each(nodes, function(node) {
         node.collapse();
         node._gui_shownPattern = ""
       });
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes));
     });
 
+    // 1. used when radiobuttons in NodeCaptionContainer (pipeline,doall...) clicked
+    // 2. used when in the search pattern table a row is clicked
     ipc.on('showANode',function(event,searchedNode,pattern){
       expansionPath.reset();
       let searchNodes = Array(1).fill(searchedNode);
       let searchPatterns = Array(1).fill(pattern);
       expansionPath.expandToNodes(searchNodes,searchPatterns,true)
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes));
     });
 
+    // used when btnShowAllNodes is clicked
     ipc.on('showAllNodes',function(event,nodeIds,nodePatterns){
       expansionPath.reset();
       expansionPath.expandToNodes(nodeIds,nodePatterns);
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes));
     })
-    ipc.on('showNodes',function(event,searchedNodesId){
-      expansionPath.reset();
-      expansionPath.expandToNodes(searchedNodesId)
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
-    });
     
     ipc.on('fullGraph', function(event) {
       var node;
@@ -353,12 +368,12 @@ module.exports = {
         }
       }
       while (stack.length);
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes));
     });
 
+    // used when in code editor on a line the context menu is used and then Show CU
     ipc.on('expandTo', function(event, nodeId) {
       var currentNode = nodes[nodeId];
-      showANode = currentNode;
       var queue = [];
       // Find nearest visible ancestor of the given node to start expanding
 		  // from
@@ -370,7 +385,7 @@ module.exports = {
         currentNode = queue.pop();
         expansionPath.addNode(currentNode);
       }
-      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes(),expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(expansionPath.getVisibleRootNodes()));
     });
 
     /**
@@ -381,27 +396,22 @@ module.exports = {
         expansionPath.reset();
         node.collapse();
       });
-      event.sender.send('update-graph', generateSvgGraph(rootNodes,expansionPath.getPipelineThreshold(),expansionPath.getDoAllThreshold()));
+      event.sender.send('update-graph', generateSvgGraph(rootNodes));
     });
 
-    ipc.on('nodeInfo', function(nodeId) {
-      var node = nodes[nodeId];
-    });
 
     /**
 	 * Generates the svg HTML-Markup for the full displayed graph
 	 * 
 	 * @return {String} the string containing the HTML-Markup for the svg
 	 */
-    function generateSvgGraph(startNodes,pipelineThreshold,doAllThreshold) {
+    function generateSvgGraph(startNodes) {
       
-      if(pipelineThreshold == undefined)
-        pipelineThreshold = configuration.readSetting('pipelineThreshold');
-      if(doAllThreshold == undefined)
-        doAllThreshold =  configuration.readSetting('doAllThreshold');
-
-      g_pipelineThreshold = pipelineThreshold;
-      g_doAllThreshold = doAllThreshold;
+      if(g_pipelineThreshold == undefined || g_pipelineThreshold == 0)
+        g_pipelineThreshold = configuration.readSetting('pipelineThreshold');
+      if(g_doAllThreshold == undefined || g_doAllThreshold == 0)
+        g_doAllThreshold =  configuration.readSetting('doAllThreshold');
+      
       var log = "StartNodes: ";
       _.each(startNodes, function(val) {
         log += val.id + ", ";
@@ -422,121 +432,17 @@ module.exports = {
 
       _.each(startNodes, function(root) {
         if (root.type == 0) {
-		  hiddenNodes.push(root);
+		      hiddenNodes.push(root);
           functionNodes = functionNodes.concat(root.children);
         } else {
           functionNodes.push(root);
         }
       });
 
-      /**
-       * creates in DOT language the node; some of the property are fixed set to get the desired look
-       * @param {Node} node     
-       * @param {String} shape  shape of the node
-       */
-      function createNode(node){
-        let tempDiagraph = "";
-        if(!node.expanded)
-          node._gui_borderColor = (node.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.NORMALBORDERCOLOR)
-        // if(node._parents.indexOf(nodeOnFocus)<0)
-        // {
-        //   node._gui_fillcolor = CONSTANTS.NORMALFILLCOLOR;
-        //   node._gui_fillcolor = CONSTANTS.NORMALBORDERCOLOR;
-        // }
-        tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' +  node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
-        return tempDiagraph;
-      }
-      /**
-		 * Recursively adds a subgraph to the digraph.
-		 * 
-		 * @param {Node}
-		 *            node the node for which to add a sub-graph
-		 */
-      function addSubgraph(node) {
-        // Avoid endless-loops for recursive-functions
-        if (checkedNodes.indexOf(node.id) > -1) {
-          return;
-        }
-        checkedNodes.push(node.id);
 
-        // Continue with new subgraph only if node is expanded, otherwise add as
-		    // node (bottom)
-        if (node.expanded) {
-          digraph += "\nsubgraph cluster" + node.id + " {"
-          var edge;
-          _.each(node.children, function(child) {
-            if (child.type == 2) {
-              addSubgraph(child);
-            } else if (child.type == 0) {
-              checkedNodes.push(child.id);
-              digraph += '\n' + createNode(child);
-
-              // Add edges to successors and predecessors of CU
-              _.each(child.successors, function(successor) {
-                visibleAncestor = findFirstVisibleAncestor(successor);
-                edge = child.id + ' -> ' + visibleAncestor.id;
-                if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
-                  digraph += "\n" + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
-                  addedFlowEdges.push(edge);
-                }
-              });
-              _.each(child.predecessors, function(predecessor) {
-                visibleAncestor = findFirstVisibleAncestor(predecessor);
-                edge = visibleAncestor.id + " -> " + child.id;
-                if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
-                  digraph += '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
-                  addedFlowEdges.push(edge);
-                }
-              });
-
-              // Add edges to called function-nodes to the queue to be added
-              // to the digraph at the end
-              // (adding them at the end, renders the called-function outside
-              // of this function)
-              if (child.expanded) {
-                _.each(child.children, function(functionCall) {
-                  if (functionCall.type == 1) {
-                    if (functionCall.expanded) {
-                      edge = child.id + ' -> ' + functionCall.entry.id;
-                      functionCallEdges.push(edge);
-                    } else {
-                      edge = child.id + ' -> ' + functionCall.id;
-                      functionCallEdges.push(edge);
-                    }
-                  } else {
-                    edge = child.id + ' -> ' + functionCall.id;
-                    digraph += '\n' + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
-                  }
-                  functionNodes.push(functionCall);
-                });
-              } 
-
-              // Add dependency-edges
-              if (child.dependenciesVisible) {
-                _.each(child.dependencies, function(dependency) {
-                  visibleAncestor = findFirstVisibleAncestor(dependency.cuNode);
-                  edge = child.id + ' -> ' + visibleAncestor.id;
-                  edge = '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '", label="' + dependency.variableName + '", taillabel="' + (dependency.isRaW() ? 'R' : 'W') + '", headlabel="' + (dependency.isWaR() ? 'R' : 'W') + '", constraint=false];';
-                  dependencyEdges.push(edge);
-                });
-              }
-            }
-          });
-          digraph += '\nlabel=' + createLabel(node) + ';';
-          digraph += 'style="rounded"';
-          digraph += 'bgcolor="#EDF1F2"'
-          digraph += 'color="' + node._gui_borderColor + '"';
-          digraph += '\nid=' + node.id;
-          digraph += "\n}";
-          if(node.expandDependency)
-          {
-            // if it should show the dependencies of the children
-            // we create here the edge DOT language
-          }
-        } else {
-          digraph += "\n" + createNode(node);// + node.id + ' [id=' + node.id + ', shape="' + shape + '", label=' + createLabel(node) + ', style="filled"];';
-        }
-      }
+      //--------------------------------------------------------------------------------------------
+      // PART 1: Build the DOT digraph
+      //--------------------------------------------------------------------------------------------
 
       digraph = "digraph G {rankdir=\"LR\"; \nnode [fontname = \"font-awesome\"];";
       while (functionNodes.length) {
@@ -557,60 +463,8 @@ module.exports = {
       _.each(dependencyEdges, function(edge) {
           digraph += edge;          
       });
-    
-      // create depedency DOT string for the children of the passed node
-      function addDependencyScript(node)
-      {
-        if (node == undefined){return "";};
-        
-        let depDotString = "";
-        if(showWeakDependency)
-        {
-            if (node.expanded){
-              if (node._gui_shownPattern == CONSTANTS.PIPELINE){
-                if(node._depBadPipelineDotString != "")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadPipelineDotString + "}"
-                }
-                if(showAllDependencies && node._depGoodPipelineDotString!="")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodPipelineDotString + "}"
-                }            
-              }
-              else if(node._gui_shownPattern == CONSTANTS.DOALL){
-                if(node._depBadDoAllDotString != "")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadDoAllDotString + "}"
-                }
-                if(showAllDependencies && node._depGoodDoAllDotString!="")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodDoAllDotString + "}"
-                }            
-              }
-              else if(node._gui_shownPattern == CONSTANTS.TASKPARALLELISM){
-                if(node._depBadDoAllDotString != "")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadTPDotString + "}"
-                }
-                if(showAllDependencies && node._depGoodDoAllDotString!="")
-                {
-                  depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodTPDotString + "}"
-                }            
-              }
-              else if(node._gui_shownPattern == CONSTANTS.GEOMETRICDECOMPOSITION){
 
-              }
-              return depDotString;
-            }
-  
-        }
-              return depDotString;
-      }
-
-      digraph += addDependencyScript(nodeOnFocus)
-
-
-      // 
+      digraph += addDependencyScript(nodeOnFocus);
       digraph += "\n}";
       
       fs.writeFile('debug_dot.txt', digraph, function(err) {
@@ -621,7 +475,11 @@ module.exports = {
           });
 	  
 
-          var svg;
+      //--------------------------------------------------------------------------------------------
+      // PART 2: create svg
+      //--------------------------------------------------------------------------------------------
+
+      var svg;
       try {
         var start = new Date().getTime();
         svg = Viz(digraph, {
@@ -692,9 +550,213 @@ module.exports = {
         });
       }
       console.log('Resulting DOT-String size: ', sizeof.sizeof(digraph, true), digraph.length);
-      //svg =svg.substring(1,svg.indexOf('g id="3"')) + svg.substring(svg.indexOf('<p',svg.indexOf('g id="3"')),svg.indexOf('/>',svg.indexOf('<p',svg.indexOf('g id="3"')))) + '>' +'<animate attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>' + '</p>'
-      return svg;
+
+            /**
+		 * Recursively adds a subgraph to the digraph.
+		 * 
+		 * @param {Node}
+		 *            node the node for which to add a sub-graph
+		 */
+    function addSubgraph(node) {
+      // Avoid endless-loops for recursive-functions
+      if (checkedNodes.indexOf(node.id) > -1) {
+        return;
+      }
+      checkedNodes.push(node.id);
+
+      // Continue with new subgraph only if node is expanded, otherwise add as
+      // node (bottom)
+      if (node.expanded) {
+        digraph += "\nsubgraph cluster" + node.id + " {"
+        var edge;
+
+        _.each(node.children, (child)=> {
+          if (child.type == 2) {
+            addSubgraph(child);
+          } else if (child.type == 0) {
+            checkedNodes.push(child.id);
+            digraph += '\n' + createNode(child);
+
+            // Add edges to successors and predecessors of CU
+            _.each(child.successors, function(successor) {
+              visibleAncestor = findFirstVisibleAncestor(successor);
+              edge = child.id + ' -> ' + visibleAncestor.id;
+              if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
+                digraph += "\n" + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
+                addedFlowEdges.push(edge);
+              }
+            });
+            _.each(child.predecessors, function(predecessor) {
+              visibleAncestor = findFirstVisibleAncestor(predecessor);
+              edge = visibleAncestor.id + " -> " + child.id;
+              if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
+                digraph += '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
+                addedFlowEdges.push(edge);
+              }
+            });
+
+            // Add edges to called function-nodes to the queue to be added
+            // to the digraph at the end
+            // (adding them at the end, renders the called-function outside
+            // of this function)
+            if (child.expanded) {
+              _.each(child.children, function(functionCall) {
+                if (functionCall.type == 1) {
+                  if (functionCall.expanded) {
+                    edge = child.id + ' -> ' + functionCall.entry.id;
+                    functionCallEdges.push(edge);
+                  } else {
+                    edge = child.id + ' -> ' + functionCall.id;
+                    functionCallEdges.push(edge);
+                  }
+                } else {
+                  edge = child.id + ' -> ' + functionCall.id;
+                  digraph += '\n' + edge + ' [id="' + edge.replace(' -> ', 't') + '",color="'+ CONSTANTS.CONTROLFLOWEDGECOLOR + '",arrowsize=.5];';
+                }
+                functionNodes.push(functionCall);
+              });
+            } 
+
+            // Add dependency-edges
+            if (child.dependenciesVisible) {
+              _.each(child.dependencies, function(dependency) {
+                visibleAncestor = findFirstVisibleAncestor(dependency.cuNode);
+                edge = child.id + ' -> ' + visibleAncestor.id;
+                edge = '\n' + edge + '[id="' + edge.replace(' -> ', 't') + '", label="' + dependency.variableName + '", taillabel="' + (dependency.isRaW() ? 'R' : 'W') + '", headlabel="' + (dependency.isWaR() ? 'R' : 'W') + '", constraint=false];';
+                dependencyEdges.push(edge);
+              });
+            }
+          }
+        });
+        digraph += '\nlabel=' + createLabel(node) + ';';
+        digraph += 'style="rounded"';
+        digraph += 'bgcolor="#EDF1F2"'
+        digraph += 'color="' + node._gui_borderColor + '"';
+        digraph += '\nid=' + node.id;
+        digraph += "\n}";
+        if(node.expandDependency)
+        {
+          // if it should show the dependencies of the children
+          // we create here the edge DOT language
+        }
+      } else {
+        digraph += "\n" + createNode(node);// + node.id + ' [id=' + node.id + ', shape="' + shape + '", label=' + createLabel(node) + ', style="filled"];';
+      }
     }
+
+      // create a list of edges of the selected node if it is expanded
+      var edgesControlFlow = [];
+      addedFlowEdges =[];
+
+      function findNextEdge(node,successor){
+        
+        visibleAncestor = findFirstVisibleAncestor(successor);
+        edge = node.id + ' -> ' + visibleAncestor.id;
+        if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
+          edgesControlFlow.push(edge.replace(' -> ', 't'))                  
+          addedFlowEdges.push(edge);
+        }
+        findNextEdge(visibleAncestor,successor)
+        
+      }
+
+      if(nodeOnFocus!=undefined){
+        if (nodeOnFocus.expanded) {
+          var edge;
+          _.each(nodeOnFocus.children, (child)=> {
+              // Add edges to successors and predecessors of CU
+              _.each(child.successors, function(successor) {
+                visibleAncestor = findFirstVisibleAncestor(successor);
+                edge = child.id + ' -> ' + visibleAncestor.id;
+                if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
+                  edgesControlFlow.push(edge.replace(' -> ', 't'))                  
+                  addedFlowEdges.push(edge);
+                }
+              });});
+          _.each(nodeOnFocus.children, (child)=>{            
+            _.each(child.predecessors, function(predecessor) {
+              visibleAncestor = findFirstVisibleAncestor(predecessor);
+              edge = visibleAncestor.id + " -> " + child.id;
+              if (addedFlowEdges.indexOf(edge) == -1 && expansionPath._visibleLevelsPerNode[child.id]<=expansionPath._visibleLevelsPerNode[visibleAncestor.id]) {
+                edgesControlFlow.push(edge.replace(' -> ', 't'))                  
+                addedFlowEdges.push(edge);
+              }
+          });
+          })
+          }}
+      //svg =svg.substring(1,svg.indexOf('g id="3"')) + svg.substring(svg.indexOf('<p',svg.indexOf('g id="3"')),svg.indexOf('/>',svg.indexOf('<p',svg.indexOf('g id="3"')))) + '>' +'<animate attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="3"></animate>' + '</p>'
+      return {
+        codeSVG: svg,
+        edges: edgesControlFlow
+      };     // return svg;
+    }
+
+          // create depedency DOT string for the children of the passed node
+          function addDependencyScript(node)
+          {
+            if (node == undefined){return "";};
+            
+            let depDotString = "";
+            if(showWeakDependency)
+            {
+                if (node.expanded){
+                  if (node._gui_shownPattern == CONSTANTS.PIPELINE){
+                    if(node._depBadPipelineDotString != "")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadPipelineDotString + "}"
+                    }
+                    if(showAllDependencies && node._depGoodPipelineDotString!="")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodPipelineDotString + "}"
+                    }            
+                  }
+                  else if(node._gui_shownPattern == CONSTANTS.DOALL){
+                    if(node._depBadDoAllDotString != "")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadDoAllDotString + "}"
+                    }
+                    if(showAllDependencies && node._depGoodDoAllDotString!="")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodDoAllDotString + "}"
+                    }            
+                  }
+                  else if(node._gui_shownPattern == CONSTANTS.TASKPARALLELISM){
+                    if(node._depBadDoAllDotString != "")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="red",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depBadTPDotString + "}"
+                    }
+                    if(showAllDependencies && node._depGoodDoAllDotString!="")
+                    {
+                      depDotString +='{edge [id = ED' + node.id + ', color="blue",penwidth="0.5",style="dashed",arrowsize=.5]; ' + node._depGoodTPDotString + "}"
+                    }            
+                  }
+                  else if(node._gui_shownPattern == CONSTANTS.GEOMETRICDECOMPOSITION){
+    
+                  }
+                  return depDotString;
+                }
+      
+            }
+                  return depDotString;
+          }
+      /**
+       * creates in DOT language the node; some of the property are fixed set to get the desired look
+       * @param {Node} node     
+       * @param {String} shape  shape of the node
+       */
+      function createNode(node){
+        let tempDiagraph = "";
+        if(!node.expanded)
+          node._gui_borderColor = (node.containsPattern(g_pipelineThreshold,g_doAllThreshold)?CONSTANTS.PATTERNBORDERCOLOR:CONSTANTS.NORMALBORDERCOLOR)
+        // if(node._parents.indexOf(nodeOnFocus)<0)
+        // {
+        //   node._gui_fillcolor = CONSTANTS.NORMALFILLCOLOR;
+        //   node._gui_fillcolor = CONSTANTS.NORMALBORDERCOLOR;
+        // }
+        tempDiagraph =  node.id + ' [id=' + node.id + ', shape=' + node._gui_shape + ';color="' +  node._gui_borderColor +'";fillcolor="' + node._gui_fillcolor +'";label=' + createLabel(node) + ', style="filled",fontsize=6,fixedsize=true,width=' + node._gui_size.width + ',height=' + node._gui_size.height + '];';
+        return tempDiagraph;
+      }
+
 
 
     function createLabel(node) {
@@ -777,4 +839,6 @@ module.exports = {
       generateSvgGraph: generateSvgGraph
     }
   }
+
+
 }

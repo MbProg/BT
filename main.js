@@ -5,6 +5,8 @@ var Menu = require('menu');
 var MenuItem = require('menu-item');
 const ipc = require("electron").ipcMain;
 var _ = require('lodash/core');
+var cloneDeep = require('lodash/cloneDeep');
+
 var configuration = require('./js/general/configuration.js');
 var dataReader = require('./js/general/data-reader.js');
 var dataInitializer = require('./js/general/data-initializer.js');
@@ -175,23 +177,25 @@ function importFiles() {
     return;
   
   console.log(mappingPath)
-  var data = dataReader.buildFromFile(mappingPath, filePaths[0]);
-  
-  if(!data){
+
+  var dataMain = dataReader.buildFromFile(mappingPath, filePaths[0]);
+  // we have to make a deep copy to give it back in did-finish-load, because somehow dataMain is filled with its previous data there
+  var dataCopy= cloneDeep(dataMain);
+  if(!dataMain){
 	mainWindow.webContents.send('alert', 'An error occurred while loading the data. Check the console log for more information.');
 	return;
   }
   
   mainWindow.webContents.on('did-finish-load', function() {
-    
-    mainWindow.webContents.send('load-data', data);
+    var dataMain= cloneDeep(dataCopy);
+    mainWindow.webContents.send('load-data', dataMain);
 
-    fileNodeIntervalTrees = dataInitializer.prepareData(data);
-    fileMaps = data.fileMapping;
+    fileNodeIntervalTrees = dataInitializer.prepareData(dataMain);
+    fileMaps = dataMain.fileMapping;
 
-    graphController = new GraphController.controller(data.nodeData, data.rootNodes);
+    graphController = new GraphController.controller(dataMain.nodeData, dataMain.rootNodes);
     mainWindow.webContents.send('init-listeners');
-    mainWindow.webContents.send('update-graph', graphController.generateSvgGraph(data.rootNodes));
+    mainWindow.webContents.send('update-graph', graphController.generateSvgGraph(dataMain.rootNodes));
   });
   mainWindow.loadURL('file://' + __dirname + '/windows/visualizer.html');
 }

@@ -40,13 +40,22 @@ ipc.on('load-data', function (event, data) {
 	editorController = new EditorController(fileMaps);
 	originalNodeIdMap = data.nodeMap;
 });
-
+$(document).ready(function() {
+	console.log("Document loaded")
+	var otherTemplate = Handlebars.compile(document.getElementById('otherSettingsTableTemplate').innerHTML);
+	var otherSettingsTemplate = otherTemplate({
+		visibleParents: configuration.readSetting('visibleParents'),
+		pipelineThreshold: configuration.readSetting('pipelineThreshold'),
+		doAllThreshold: configuration.readSetting('doAllThreshold')
+	  });
+  	$("#otherSettings").html(otherSettingsTemplate);
+});
 /**
  * Receives a string containing the html-markup (as svg) of the new graph to be
  * rendered
  */
-ipc.on('update-graph', function (event, svg) {
-	$("#flow-graph-container").html(svg);
+ipc.on('update-graph', function (event, svgPlusEdges) {
+	$("#flow-graph-container").html(svgPlusEdges.codeSVG);
 	// first blink by animation the cluster
 	// var path = document.getElementById('3').getElementsByTagName('path')[0]
 	// path.setAttribute("id", "pathCluster3");
@@ -54,39 +63,58 @@ ipc.on('update-graph', function (event, svg) {
 	// path.insertAdjacentHTML( 'afterbegin', newElement );
 
 	// now move circle on the path 
-	var g8t3 = document.getElementById('8t4');
-	var path = document.getElementById('8t4').getElementsByTagName('path')[0]
-	path.setAttribute("id", "path8t4");
-	var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation8t4" dur="3s"  begin="myMoveAnimation7t8.end"><mpath xlink:href="#path8t4"></mpath></animateMotion></circle>'
-	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	var counter = 0;
+	if(svgPlusEdges.edges != undefined){
+		var edges = svgPlusEdges.edges;
+		var e = document.getElementById(edges[0]);
+		var circleAnim = '<circle r="1" fill="green">'
+		for(counter = 0;counter < edges.length;counter++){
+			edge = edges[counter];
+			var path = document.getElementById(edge).getElementsByTagName('path')[0]
+			path.setAttribute("id","path"+edge);
+			if (counter ==0)
+				circleAnim += '<animateMotion id="myMoveAnimation'+ edge + '" dur="3s"  begin="0s;myMoveAnimation'+ edges[edges.length-1] +'.end"><mpath xlink:href="#path' + edge + '" fill="freeze"></mpath></animateMotion>'
+			else
+				circleAnim += '<animateMotion id="myMoveAnimation'+ edge + '" dur="3s"  begin="myMoveAnimation'+ edges[counter-1] +'.end" fill="freeze"><mpath xlink:href="#path' + edge + '"></mpath></animateMotion>'
+		
+		}
+		circleAnim += '</circle>'
+		e.insertAdjacentHTML('beforeend',circleAnim);
+		//document.getElementById("myMoveAnimation" + edges[0]).beginElement();
+	}
+	// var g8t3 = document.getElementById('8t4');
+	// var path = document.getElementById('8t4').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "path8t4");
+	// var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation8t4" dur="3s"  begin="myMoveAnimation7t8.end"><mpath xlink:href="#path8t4"></mpath></animateMotion></circle>'
+	// g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 
-	// now move circle on the path 
-	var g8t3 = document.getElementById('4t5');
-	var path = document.getElementById('4t5').getElementsByTagName('path')[0]
-	path.setAttribute("id", "path4t5");
-	var circleAnim = ' <circle r="1.5" fill="green"><animateMotion id="myMoveAnimation4t5" dur="3s"  begin="0s;myMoveAnimation8t4.end"><mpath xlink:href="#path4t5"></mpath></animateMotion></circle>'
-	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// // now move circle on the path 
+	// var g8t3 = document.getElementById('4t5');
+	// var path = document.getElementById('4t5').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "path4t5");
+	// var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation4t5" dur="3s"  begin="0s;myMoveAnimation8t4.end"><mpath xlink:href="#path4t5"></mpath></animateMotion></circle>'
+	// g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
 
-	// now move circle on the path 
-	var g8t3 = document.getElementById('5t6');
-	var path = document.getElementById('5t6').getElementsByTagName('path')[0]
-	path.setAttribute("id", "path5t6");
-	var circleAnim = ' <circle r="1.2" fill="green"><animateMotion id="myMoveAnimation5t6" dur="3s"  begin="myMoveAnimation4t5.end"><mpath xlink:href="#path5t6"></mpath></animateMotion></circle>'
-	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
-	// now move circle on the path 
-	var g8t3 = document.getElementById('6t7');
-	var path = document.getElementById('6t7').getElementsByTagName('path')[0]
-	path.setAttribute("id", "path6t7");
-	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation6t7" dur="3s"  begin="myMoveAnimation5t6.end"><mpath xlink:href="#path6t7"></mpath></animateMotion></circle>'
-	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
-	// now move circle on the path 
-	var g8t3 = document.getElementById('7t8');
-	var path = document.getElementById('7t8').getElementsByTagName('path')[0]
-	path.setAttribute("id", "path7t8");
-	var circleAnim = ' <circle r="2" fill="green"><animateMotion id="myMoveAnimation7t8" dur="3s"  begin="myMoveAnimation6t7.end"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
-	g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
-	// document.getElementById("myAnimation").beginElement();
-	document.getElementById("myMoveAnimation4t5").beginElement();
+	// // now move circle on the path 
+	// var g8t3 = document.getElementById('5t6');
+	// var path = document.getElementById('5t6').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "path5t6");
+	// var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation5t6" dur="3s"  begin="myMoveAnimation4t5.end"><mpath xlink:href="#path5t6"></mpath></animateMotion></circle>'
+	// g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// // now move circle on the path 
+	// var g8t3 = document.getElementById('6t7');
+	// var path = document.getElementById('6t7').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "path6t7");
+	// var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation6t7" dur="3s"  begin="myMoveAnimation5t6.end"><mpath xlink:href="#path6t7"></mpath></animateMotion></circle>'
+	// g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// // now move circle on the path 
+	// var g8t3 = document.getElementById('7t8');
+	// var path = document.getElementById('7t8').getElementsByTagName('path')[0]
+	// path.setAttribute("id", "path7t8");
+	// var circleAnim = ' <circle r="1" fill="green"><animateMotion id="myMoveAnimation7t8" dur="3s"  begin="myMoveAnimation6t7.end"><mpath xlink:href="#path7t8"></mpath></animateMotion></circle>'
+	// g8t3.insertAdjacentHTML( 'beforeend', circleAnim );
+	// // document.getElementById("myAnimation").beginElement();
+	// document.getElementById("myMoveAnimation4t5").beginElement();
 	
 	// $("#3").find("path").append('<animate id="animateCluster" attributeType="XML" attributeName="stroke-width" values="6;1;6;1" dur="2s" repeatCount="indefinite"></animate>');
 	// $("#animateCluster").beginElement();
@@ -185,22 +213,22 @@ ipc.on('init-listeners', function (event) {
 		_.each(nodeData,function(node){
 			if ((option & 1) && node._pipelineScalarValue >=pipelineThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-road"></i></span><span class="Pattern">' + CONSTANTS.PIPELINE + '</span></td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><img id="imgPipeline" class="patternlogos" src="../images/pipeline.png"/></span><span class="Pattern">' + CONSTANTS.PIPELINE + '</span></td><td style="width:10%;">' + node._pipelineScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 2) && node._doAllScalarValue >=doAllThreshold)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-flash"></i></span><span class="Pattern">' + CONSTANTS.DOALL + '</span></td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><img id="imgdoAll" class="patternlogos" src="../images/doAll.png"/></span><span class="Pattern">' + CONSTANTS.DOALL + '</span></td><td style="width:10%;">' + node._doAllScalarValue + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 4) && node._taskParallelism == 1)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-hd-video"></i></span><span class="Pattern">' + CONSTANTS.TASKPARALLELISM + '</span></td><td style="width:10%;">' + node._taskParallelism + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><img id="imgTP" class="patternlogos" src="../images/tp.png"/></span><span class="Pattern">' + CONSTANTS.TASKPARALLELISM + '</span></td><td style="width:10%;">' + node._taskParallelism + '</td></tr>'
 				tablescripts.push(s);
 			}
 			if ((option & 8) && node._geometricDecomposition == 1)
 			{
-				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><i class="glyphicon glyphicon-random"></i></span><span class="Pattern">' + CONSTANTS.GEOMETRICDECOMPOSITION + '</span></td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
+				var s = '<tr><td style="width:20%;">' + node._originalId + '</td><td style="width:70%;"><span><img id="imgTP" class="patternlogos" src="../images/gd.png"/></i></span><span class="Pattern">' + CONSTANTS.GEOMETRICDECOMPOSITION + '</span></td><td style="width:10%;">' + node._geometricDecomposition + '</td></tr>'
 				tablescripts.push(s);
 			}
 
@@ -287,6 +315,7 @@ ipc.on('init-listeners', function (event) {
 	var clicktimer;
 	// Node selection
 	graphContainer.delegate('g.node, g.cluster', 'click', function (e) {
+		console.log('click')
 		e.stopImmediatePropagation();
 		if(clicktimer){
 			clearTimeout(clicktimer);
@@ -455,7 +484,7 @@ ipc.on('init-listeners', function (event) {
 
 	// Double click events
 	graphContainer.delegate('g.node', 'dblclick', function (event) {
-		debugger;
+		console.log('dblclick')
 		event.stopImmediatePropagation();
 		var node = nodeData[this.id];
 		var cuNodes, loopNodes, functionNodes;
@@ -717,4 +746,12 @@ function rbTaskParallelismClicked(rb){
 		ipc.send('showANode',getlblNodeId(),CONSTANTS.TASKPARALLELISM);
 	}	
 }
+
+function saveSettings(btn) {
+	$(".settingInput").each(function() {
+		console.log('Saving: ' + $(this).data('key') + ' = ' + $(this).val());
+		configuration.saveSetting($(this).data('key'), $(this).val());
+	  });
+	  ipc.send('saveGraphSettings');
+  }
 
